@@ -41,6 +41,11 @@ const userSchema = new Schema(
       default: 'none',
       enum: ['finance', 'non-finance', 'none'],
     },
+    bvn: String,
+    isBVNVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
