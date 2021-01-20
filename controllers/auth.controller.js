@@ -3,11 +3,12 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
 
+const { validate } = require('../utils/validator');
 
 class AuthController {
   static async login(req, res, next) {
     try {
-      this.validateRequest(req.body, 'login');
+      AuthController.validateRequest(req.body, 'login');
 
       passport.authenticate('local', function (err, user, info) {
         if (err) return res.status(401).json(err);
@@ -43,7 +44,7 @@ class AuthController {
 
   static async changePassword(req, res, next) {
     try {
-      this.validateRequest(req.body, 'change-password');
+      AuthController.validateRequest(req.body, 'change-password');
 
       const user = req.user;
 
@@ -72,7 +73,7 @@ class AuthController {
       case 'login':
         fields = {
           email: {
-            type: 'email',
+            type: 'string',
             required: true,
           },
           password: {
@@ -85,7 +86,7 @@ class AuthController {
       case 'change-password':
         fields = {
           oldPassword: {
-            type: 'email',
+            type: 'string',
             required: true,
           },
           newPassword: {

@@ -9,6 +9,7 @@ const routes = require('./routes');
 const { dev, MONGO_URL } = require('./config/remotes');
 const Database = require('./config/db');
 const cors = require('./config/cors');
+const errorHandler = require('./middlewares/error-handler');
 
 const allowedOrigins = ['https://production.app.com'];
 
@@ -32,6 +33,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/v1', routes);
+app.use(errorHandler);
 app.use((req, res) => res.status(404).json({ message: 'URL Not Found' }));
 
 require('./config/passport');

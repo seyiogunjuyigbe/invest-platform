@@ -7,7 +7,7 @@ const { validate } = require('../utils/validator');
 class UsersController {
   static async createUser(req, res, next) {
     try {
-      this.validateRequest(req.body, false, req.path.includes('signup'));
+      UsersController.validateRequest(req.body, false, req.path.includes('signup'));
 
       const user = await User.create(req.body);
 
@@ -48,7 +48,7 @@ class UsersController {
 
   static async updateUser(req, res, next) {
     try {
-      this.validateRequest(req.body, true);
+      UsersController.validateRequest(req.body, true);
 
       const user = await findOne(User, req);
 
@@ -105,7 +105,7 @@ class UsersController {
         required: !isUpdate,
       },
       email: {
-        type: 'email',
+        type: 'string',
         required: !isUpdate,
       },
       phone: {
