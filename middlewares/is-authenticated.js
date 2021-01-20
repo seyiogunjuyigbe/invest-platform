@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 
+const User = require('../models/user.model');
+
 module.exports = function (req, res, next) {
   if (req.headers && req.headers.authorization) {
     var parts = req.headers.authorization.split(' ');
@@ -9,22 +11,27 @@ module.exports = function (req, res, next) {
       var credentials = parts[1];
       if (/^Bearer$/i.test(scheme)) {
         token = credentials;
-        jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
+        jwt.verify(token, process.env.JWT_SECRET, async function (err, decoded) {
           if (err) {
-            return res.status(401).json({ status: false, message: err.message });
+            return res.status(401).json({ message: err.message });
           }
 
-          req.user = decoded;
+          req.user = await User.findById(decoded._id);
+          if (!req.user) {
+            return res.status(401).json({
+              message: 'Invalid auth credentials',
+            });
+          }
 
           next();
         });
       } else {
-        return res.status(401).json({ status: false, message: 'Format is Authorization: Bearer [token]' });
+        return res.status(401).json({ message: 'Format is Authorization: Bearer [token]' });
       }
     } else {
-      return res.status(401).json({ status: false, message: 'Format is Authorization: Bearer [token]' });
+      return res.status(401).json({ message: 'Format is Authorization: Bearer [token]' });
     }
   } else {
-    return res.status(401).json({ status: false, message: 'No Authorization header was found' });
+    return res.status(401).json({ message: 'No Authorization header was found' });
   }
 };

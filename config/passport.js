@@ -9,14 +9,16 @@ passport.use(new LocalStrategy(
     passReqToCallback: true,
   },
   function (req, email, password, done) {
-    User.findOne({ email: email, isDeleted: false }, function (err, user) {
+    User.findOne({ email }, async function (err, user) {
       if (err) { return done(err); }
 
       if (!user) {
         return done(null, false, { message: 'Invalid credentials.' });
       }
 
-      if (!user.validPassword(password)) {
+      const isValidPassword = await user.validPassword(password);
+
+      if (!isValidPassword) {
         return done(null, false, { message: 'Invalid password.' });
       }
 
