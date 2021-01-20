@@ -1,6 +1,7 @@
 const createError = require('http-errors');
+const mongoose = require('mongoose');
 
-const User = require('../models/user');
+const User = mongoose.model('User');
 const { findOne, find } = require('../utils/query');
 const { validate } = require('../utils/validator');
 

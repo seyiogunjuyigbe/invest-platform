@@ -27,7 +27,8 @@ const userSchema = new Schema(
       required: true,
     },
     isEmailVerifed: {
-      type: String,
+      type: Boolean,
+      default: false,
     },
     type: {
       type: String,
@@ -65,20 +66,8 @@ userSchema.pre('save', function saveHook(next) {
   return next();
 });
 
-userSchema.methods.comparePassword = function comparePassword(password, cb) {
-  if (!this.password && cb) {
-    return cb(new Error('Registration not complete'), false);
-  }
-
-  if (!cb && this.password) {
-    return bcrypt.compareSync(password, this.password);
-  }
-
-  if (cb) {
-    bcrypt.compare(password, this.password, (err, isMatch) => {
-      cb(err, isMatch);
-    });
-  }
+userSchema.methods.validPassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
 };
 
 const userModel = mongoose.model('User', userSchema);
