@@ -29,6 +29,17 @@ const userSchema = new Schema(
     isEmailVerifed: {
       type: String,
     },
+    type: {
+      type: String,
+      default: 'investor',
+      enum: ['investor', 'admin', 'superadmin'],
+      required: true,
+    },
+    role: {
+      type: String,
+      default: 'none',
+      enum: ['finance', 'non-finance', 'none'],
+    },
   },
   {
     timestamps: true,

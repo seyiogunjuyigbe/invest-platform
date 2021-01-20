@@ -4,20 +4,20 @@ const path = require('path');
 const bParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const { dev, MONGO_URL } = require('./config/remotes');
 
-const allowedOrigins = ['https://production.app.com'];
+const routes = require('./routes');
+const { dev, MONGO_URL } = require('./config/remotes');
 const Database = require('./config/db');
 const cors = require('./config/cors');
+
+const allowedOrigins = ['https://production.app.com'];
 
 if (dev) {
   const allowedDevOrigins = ['http://localhost:8882'];
   allowedOrigins.push(...allowedDevOrigins);
 }
-new Database().connect(MONGO_URL);
 
-// const indexRouter = require('./routes/index');
-// const usersRouter = require('./routes/users');
+new Database().connect(MONGO_URL);
 
 const app = express();
 app.use(bParser.json({ limit: '50mb' }));
@@ -31,7 +31,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
+app.use('/api/v1', routes);
 
 module.exports = app;
