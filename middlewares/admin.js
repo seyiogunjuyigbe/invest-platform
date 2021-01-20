@@ -1,5 +1,3 @@
-const Role = require('../components/role/role.model');
-
 module.exports = function (criteria) {
   return async function (req, res, next) {
     if (!req.user) {
