@@ -16,9 +16,11 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
-    phoneNo: {
+    phone: {
       type: String,
+      unique: true,
     },
     password: {
       type: String,
