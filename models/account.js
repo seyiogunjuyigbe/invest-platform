@@ -7,8 +7,13 @@ const userSchema = new Schema(
     type: {
       type: String,
       default: 'investor',
-      enum: ['investor', 'admin'],
+      enum: ['investor', 'admin', 'superadmin'],
       required: true,
+    },
+    role: {
+      type: String,
+      default: 'none',
+      enum: ['finance', 'non-finance', 'none'],
     },
     owner: {
       type: Schema.Types.ObjectId,
