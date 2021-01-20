@@ -1,6 +1,6 @@
 class Account {
-  function(req, res, next) {
+  function(req, res) {
     res.render('index', { title: 'Express' });
   }
 }
-module.exports =  Account
+module.exports = Account;
