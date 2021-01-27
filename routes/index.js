@@ -3,8 +3,10 @@ const router = express.Router();
 
 const UserRoutes = require('./users.route');
 const AuthRoutes = require('./auth.route');
+const WalletRoutes = require('./wallets.route');
 
 router.use('/users', UserRoutes);
 router.use('/auth', AuthRoutes);
+router.use('/wallets', WalletRoutes);
 
 module.exports = router;
