@@ -33,6 +33,19 @@ class UsersController {
     }
   }
 
+  static async getWallet(req, res, next) {
+    try {
+      const wallet = await req.user.getWallet();
+
+      return res.status(200).json({
+        message: 'wallet retrieved successfully',
+        data: wallet,
+      })
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async listUsers(req, res, next) {
     try {
       const users = await find(User, req);
