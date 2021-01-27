@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const Wallet = require('./wallet.model');
+
 const { Schema } = mongoose;
 
 const userSchema = new Schema(
@@ -73,6 +75,14 @@ userSchema.pre('save', function saveHook(next) {
 
 userSchema.methods.validPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.getWallet = async function () {
+  const wallet = await Wallet.findOne({
+    user: this.id,
+  });
+
+  return wallet || await Wallet.create({ user: this.id });
 };
 
 const userModel = mongoose.model('User', userSchema);
