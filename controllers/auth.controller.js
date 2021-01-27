@@ -25,7 +25,6 @@ class AuthController {
         );
 
         jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
-          req.user = user;
           return res.status(200).json({
             message: 'Login successful',
             data: {
