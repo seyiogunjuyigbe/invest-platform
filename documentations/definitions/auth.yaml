@@ -1,0 +1,27 @@
+# Auth Definitions
+  AuthResponse:
+    type: object
+    properties:
+      token:
+        type: string
+      issue:
+        type: number
+      expires:
+        type: number
+# Auth Models
+  UserLogin:
+    type: object
+    properties:
+      email:
+        type: string
+        description: user email
+      password:
+        type: string
+        description: user password
+    example:
+      email: user@example.com
+      password: Pas$W0rd
+     
+    required:
+      - email
+      - password
