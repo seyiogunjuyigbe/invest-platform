@@ -25,6 +25,8 @@ if (dev) {
 new Database().connect(MONGO_URL);
 
 const app = express();
+app.set('views', path.join(__dirname, 'public'));
+app.set('view engine', 'pug');
 app.use(bParser.json({ limit: '50mb' }));
 app.use(
   bParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 500000 })
@@ -52,6 +54,7 @@ app.get('/swagger.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(load(swaggerSchema));
 });
+app.get('/', (req, res) => res.render('index'));
 app.use(errorHandler);
 app.use((req, res) => res.status(404).json({ message: 'URL Not Found' }));
 
