@@ -1,0 +1,55 @@
+# Wallet Paths
+  /wallets:
+    get:
+      summary: fetch all user wallets
+      description: fetch all user wallets
+      operationId: fetchWallets
+      tags:
+      - Wallets
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+             $ref: "#/definitions/Wallet"
+  /wallets/{walletId}:
+    get:
+      summary: fetch wallet
+      description: fetch wallet
+      operationId: fetchWallet
+      tags:
+      - Wallets
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+             $ref: "#/definitions/Wallet"             
+  /wallets/{walletId}/histories:
+    get:
+      summary: fetch wallet histoies
+      description: fetch wallet histories
+      operationId: fetchWalletHistories
+      tags:
+      - Wallets
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+             $ref: "#/definitions/Wallet"
