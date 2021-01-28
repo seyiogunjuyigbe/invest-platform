@@ -8,8 +8,8 @@ const isAuthenticated = require('../middlewares/is-authenticated');
 router.post('/', isAuthenticated, adminRoute(), UsersController.createUser);
 router.post('/signup', UsersController.createUser);
 router.get('/', isAuthenticated, adminRoute(), UsersController.listUsers);
-router.get('/:userId', isAuthenticated, UsersController.fetchUser);
 router.get('/get-wallet', isAuthenticated, UsersController.getWallet);
+router.get('/:userId', isAuthenticated, UsersController.fetchUser);
 router.put('/:userId', isAuthenticated, UsersController.updateUser);
 router.delete(
   '/:userId',

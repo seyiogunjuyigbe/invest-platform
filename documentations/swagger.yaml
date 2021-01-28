@@ -1,0 +1,32 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: Black Gold
+# during dev, should point to your local machine
+# host: localhost
+basePath: /api/v1
+#
+schemes:
+# tip: remove http to make production-grade
+ - https
+ - http
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+<% if (locals.paths) { %>
+paths:
+  <%- locals.paths %>
+<% } %>
+
+<% if (locals.models) { %>
+models:
+  <%- locals.models %>
+<% } %>
+
+<% if (locals.definitions) { %>
+definitions:
+  <%- locals.definitions %>
+<% } %>
