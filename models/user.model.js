@@ -43,6 +43,7 @@ const userSchema = new Schema(
       default: 'none',
       enum: ['finance', 'non-finance', 'none'],
     },
+    notificationToken: String,
     bvn: String,
     isBVNVerified: {
       type: Boolean,
