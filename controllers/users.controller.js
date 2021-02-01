@@ -1,16 +1,25 @@
 const createError = require('http-errors');
-
-const User = require('../models/user.model');
-const { findOne, find } = require('../utils/query');
+const { customAlphabet } = require("nanoid")
 const { validate } = require('../utils/validator');
-
+const Otp = require("../models/otp.model")
+const { sendMail } = require("../services/mailService")
+const moment = require("moment")
+const User = require("../models/user.model")
 class UsersController {
   static async createUser(req, res, next) {
     try {
       UsersController.validateRequest(req.body, false, req.path.includes('signup'));
-
       const user = await User.create(req.body);
-
+      let expiry = moment.utc().add(1, 'hours')
+      let otp = await Otp.create({
+        otp: customAlphabet("23456789ADFGHJKLMNBVCXZPUYTREWQ", 8)(),
+        type: "verify-email",
+        user,
+        expiry,
+      });
+      let message = `Use this code to verify your email ${otp.otp}. This code expires in 1 hour`
+      console.log({ otp })
+      await sendMail("Verify you email", user.email, message);
       return res.status(200).json({
         message: 'user created successfully',
         data: user,

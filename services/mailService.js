@@ -1,5 +1,5 @@
 const sgMail = require('@sendgrid/mail');
-const { SENDGRID_API_KEY, MAIL_SENDER } = require('../config/constants');
+const { SENDGRID_API_KEY, MAIL_SENDER } = process.env;
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -17,7 +17,8 @@ module.exports = {
             const m = await sgMail.send(mailOptions);
             return m;
         } catch (err) {
-            throw new Error(err.message);
+
+            throw new Error(err);
         }
     },
 };
