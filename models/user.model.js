@@ -43,6 +43,7 @@ const userSchema = new Schema(
       default: 'none',
       enum: ['finance', 'non-finance', 'none'],
     },
+    notificationToken: String,
     bvn: String,
     isBVNVerified: {
       type: Boolean,
@@ -51,7 +52,7 @@ const userSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 userSchema.statics.comparePassword = async (password, userPassword) =>
@@ -82,7 +83,7 @@ userSchema.methods.getWallet = async function () {
     user: this.id,
   });
 
-  return wallet || await Wallet.create({ user: this.id });
+  return wallet || (await Wallet.create({ user: this.id }));
 };
 
 const userModel = mongoose.model('User', userSchema);

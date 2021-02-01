@@ -136,6 +136,9 @@ class AuthController {
           message: "No account found with this email"
         })
       };
+      if (user.isEmailVerifed) {
+        return res.status(409).json({ message: "User account already verified" })
+      }
       // expire all previous tokens
       let previousOtps = await Otp.find({ user, isExpired: false, type: "verify-email", });
       previousOtps.forEach(previousOtp => {
@@ -172,6 +175,9 @@ class AuthController {
         return res.status(401).json({ message: "This code is expired. Please request a new one" })
       }
       let { user } = otp;
+      if (user.isEmailVerifed) {
+        return res.status(409).json({ message: "User account already verified" })
+      }
       user.isEmailVerifed = true;
       console.log({ otp, user })
       otp.isExpired = true;
