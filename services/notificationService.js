@@ -45,7 +45,7 @@ module.exports = {
             return null
         }
     },
-    async generateBeamsToken(user) {
+    async generateNotificationToken(user) {
         try {
             let token = await beamsClient.generateToken(user.id);
             user.notificationToken = token
