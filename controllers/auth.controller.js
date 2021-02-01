@@ -78,10 +78,10 @@ class AuthController {
         })
       } else {
         // expire previous Otps
-      await Otp.updateMany(
-  { user: user.id, isExpired: false, type: "reset-password" },
-  { isExpired: true },
-);
+        await Otp.updateMany(
+          { user: user.id, isExpired: false, type: "reset-password" },
+          { isExpired: true },
+        );
         let expiry = moment.utc().add(1, 'hours')
         let otp = await Otp.create({
           otp: customAlphabet("23456789ADFGHJKLMNBVCXZPUYTREWQ", 8)(),
@@ -89,11 +89,11 @@ class AuthController {
           user,
           expiry,
         });
-        console.log({ otp })
-
         let message = `Use this code to reset your password: ${otp.otp}. This code expires in 1 hour`
         await sendMail("Password Reset", user.email, message)
-        return res.status(200).json({ message: "A reset code has been sent to your email address" })
+        return res
+          .status(200)
+          .json({ message: "A reset code has been sent to your email address" })
       }
     } catch (err) {
       next(err)
@@ -140,10 +140,10 @@ class AuthController {
       }
       // expire all previous tokens
 
-await Otp.updateMany(
-  { user: user.id, isExpired: false, type: "verify-email" },
-  { isExpired: true },
-);
+      await Otp.updateMany(
+        { user: user.id, isExpired: false, type: "verify-email" },
+        { isExpired: true },
+      );
       let expiry = moment.utc().add(1, 'hours')
       let otp = await Otp.create({
         otp: customAlphabet("23456789ADFGHJKLMNBVCXZPUYTREWQ", 8)(),
