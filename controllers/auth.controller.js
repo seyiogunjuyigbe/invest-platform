@@ -78,11 +78,10 @@ class AuthController {
         })
       } else {
         // expire previous Otps
-        let previousOtps = await Otp.find({ user, isExpired: false, type: "reset-password", });
-        previousOtps.forEach(previousOtp => {
-          previousOtp.isExpired = true;
-          previousOtp.save()
-        })
+      await Otp.updateMany(
+  { user: user.id, isExpired: false, type: "reset-password" },
+  { isExpired: true },
+);
         let expiry = moment.utc().add(1, 'hours')
         let otp = await Otp.create({
           otp: customAlphabet("23456789ADFGHJKLMNBVCXZPUYTREWQ", 8)(),
@@ -140,11 +139,11 @@ class AuthController {
         return res.status(409).json({ message: "User account already verified" })
       }
       // expire all previous tokens
-      let previousOtps = await Otp.find({ user, isExpired: false, type: "verify-email", });
-      previousOtps.forEach(previousOtp => {
-        previousOtp.isExpired = true;
-        previousOtp.save()
-      })
+
+await Otp.updateMany(
+  { user: user.id, isExpired: false, type: "verify-email" },
+  { isExpired: true },
+);
       let expiry = moment.utc().add(1, 'hours')
       let otp = await Otp.create({
         otp: customAlphabet("23456789ADFGHJKLMNBVCXZPUYTREWQ", 8)(),
