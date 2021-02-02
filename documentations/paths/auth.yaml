@@ -47,7 +47,7 @@
             example:
   
   /auth/resend-verification:
-    post:
+    get:
       summary: Resends verification email to user
       description: Initiate email verification for user by sending verification to the user
       operationId: verifyUserEmail
@@ -98,7 +98,7 @@
               message: An unexpected error occured
 
   /auth/recover-password:
-    post:
+    get:
       summary: Request password reset
       operationId: passwordResetRequest
       tags:
@@ -157,51 +157,3 @@
           description: Unexpected server error
           schema:
             example:           
-      # /auth/profile/{userId}:
-  #   get:
-  #     summary: Get current user data
-  #     operationId: viewCurrentUser
-  #     tags:
-  #     - Authentication
-  #     parameters:
-  #       - in: header
-  #         name: Authorization
-  #         description: Authentication token
-  #         required: true
-  #     responses:
-  #       200:
-  #         description: Success
-  #         schema:
-  #           $ref: "#/definitions/User"
-  #       403:
-  #         description: Not authorized
-  #         schema:
-  #           example:
-  #             message: You are not authorized to access this resource
-  #       500:
-  #         description: Unexpected server error
-  #         schema:
-  #           example:
-  #             message: An unexpected error occured
-
- 
-  # /auth/signup:
-  #   post:
-  #     summary: Create new user with email
-  #     description: Create a new account for user using email and password
-  #     operationId: createUser
-  #     tags:
-  #     - Authentication
-  #     parameters:
-  #       - in: body
-  #         name: payload
-  #         description: User credentials to use for registration
-  #         required: true
-  #         schema:
-  #           $ref: "#/definitions/User"
-  #     responses:
-  #       200:
-  #         description: Success
-  #         schema:
-  #           example:
-  #             message: A code has been sent to your email for verification.  
