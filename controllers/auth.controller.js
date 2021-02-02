@@ -27,7 +27,7 @@ class AuthController {
             'isEmailVerified',
           ]),
           process.env.JWT_SECRET,
-          { expiry: process.env.TOKEN_EXPIRY || 604800 }, // 7 days
+          { expiresIn: process.env.TOKEN_EXPIRY || 604800 }, // 7 days
         );
 
         jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {

@@ -7,15 +7,6 @@ const beamsClient = new pushNotification({
 });
 
 module.exports = {
-  // async createNotification(user, title, message) {
-  //     try {
-  //         let notification = await Notification.create({ user, title, message });
-  //         await sendMail(title, user.email, message);
-  //         return notification;
-  //     } catch (err) {
-  //         return null;
-  //     }
-  // },
   async sendPushNotification(users = [], title, body) {
     try {
       let notification = await beamsClient.publishToUsers([...users], {
