@@ -52,7 +52,7 @@ const userSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 userSchema.statics.comparePassword = async (password, userPassword) =>
@@ -83,7 +83,7 @@ userSchema.methods.getWallet = async function () {
     user: this.id,
   });
 
-  return wallet || await Wallet.create({ user: this.id });
+  return wallet || (await Wallet.create({ user: this.id }));
 };
 
 const userModel = mongoose.model('User', userSchema);
