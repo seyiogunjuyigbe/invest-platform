@@ -19,7 +19,7 @@ class UsersController {
       });
       let message = `Use this code to verify your email ${otp.otp}. This code expires in 1 hour`
       console.log({ otp })
-      await sendMail("Verify you email", user.email, message);
+      await sendMail("Verify your email", user.email, message);
       return res.status(200).json({
         message: 'user created successfully',
         data: user,
