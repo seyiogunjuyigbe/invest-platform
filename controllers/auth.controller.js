@@ -72,8 +72,12 @@ class AuthController {
   }
   static async requestPasswordReset(req, res, next) {
     try {
-      let { email } = req.body;
-      AuthController.validateRequest(req.body, 'reset-password');
+      let { email } = req.query;
+      if (!email) {
+        return res.status(400).json({
+          message: 'Email address is required',
+        });
+      }
       let user = await User.findOne({ email });
       if (!user) {
         return res.status(403).json({
@@ -140,8 +144,12 @@ class AuthController {
   }
   static async resendVerificationToken(req, res, next) {
     try {
-      let { email } = req.body;
-      AuthController.validateRequest(req.body, 'verification');
+      let { email } = req.query;
+      if (!email) {
+        return res.status(400).json({
+          message: 'Email address is required',
+        });
+      }
       let user = await User.findOne({ email });
       if (!user) {
         return res.status(403).json({
