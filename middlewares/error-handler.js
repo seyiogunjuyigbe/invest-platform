@@ -1,6 +1,6 @@
 const { omit } = require('lodash');
 
-module.exports = (err, req, res, next) => {
+module.exports = (err, req, res) => {
   console.error(err);
   const isProd = process.env.NODE_ENV === 'production';
 
@@ -19,12 +19,16 @@ module.exports = (err, req, res, next) => {
     const errorText = JSON.parse(err.response.text);
 
     if (errorText) {
-      return res.status(400).send({ message: errorText.message || errorText.error });
+      return res
+        .status(400)
+        .send({ message: errorText.message || errorText.error });
     }
   }
 
   if (err) {
-    return res.status(err.status).send({ message: err.message, errors: omit(err, ['response']) });
+    return res
+      .status(err.status)
+      .send({ message: err.message, errors: omit(err, ['response']) });
   }
 
   res.status(404).json({ message: 'Not Found' });

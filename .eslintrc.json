@@ -19,10 +19,6 @@
     "prettier"
   ],
   "rules": {
-    "indent": [
-      "error",
-      2
-    ],
     "no-underscore-dangle": "off",
     "no-console": "off",
     "camelcase": "off",

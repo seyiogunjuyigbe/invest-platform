@@ -1,29 +1,35 @@
 const createError = require('http-errors');
-const { customAlphabet } = require("nanoid")
+const { customAlphabet } = require('nanoid');
+const moment = require('moment');
 const { validate } = require('../utils/validator');
-const Otp = require("../models/otp.model")
-const { sendMail } = require("../services/mailService")
-const moment = require("moment")
-const User = require("../models/user.model")
+const Otp = require('../models/otp.model');
+const { sendMail } = require('../services/mail.service');
+const User = require('../models/user.model');
+const { find, findOne } = require('../utils/query');
+
 class UsersController {
   static async createUser(req, res, next) {
     try {
-      UsersController.validateRequest(req.body, false, req.path.includes('signup'));
+      UsersController.validateRequest(
+        req.body,
+        false,
+        req.path.includes('signup')
+      );
       const user = await User.create(req.body);
-      let expiry = moment.utc().add(1, 'hours')
-      let otp = await Otp.create({
-        otp: customAlphabet("23456789ADFGHJKLMNBVCXZPUYTREWQ", 8)(),
-        type: "verify-email",
+      const expiry = moment.utc().add(1, 'hours');
+      const otp = await Otp.create({
+        otp: customAlphabet('23456789ADFGHJKLMNBVCXZPUYTREWQ', 8)(),
+        type: 'verify-email',
         user,
         expiry,
       });
-      let message = `Use this code to verify your email ${otp.otp}. This code expires in 1 hour`
-      console.log({ otp })
-      await sendMail("Verify your email", user.email, message);
+      const message = `Use this code to verify your email ${otp.otp}. This code expires in 1 hour`;
+      console.log({ otp });
+      await sendMail('Verify your email', user.email, message);
       return res.status(200).json({
         message: 'user created successfully',
         data: user,
-      })
+      });
     } catch (error) {
       next(error);
     }
@@ -36,7 +42,7 @@ class UsersController {
       return res.status(200).json({
         message: 'user retrieved successfully',
         data: user,
-      })
+      });
     } catch (error) {
       next(error);
     }
@@ -49,7 +55,7 @@ class UsersController {
       return res.status(200).json({
         message: 'wallet retrieved successfully',
         data: wallet,
-      })
+      });
     } catch (error) {
       next(error);
     }
@@ -62,7 +68,7 @@ class UsersController {
       return res.status(200).json({
         message: 'users retrieved successfully',
         data: users,
-      })
+      });
     } catch (error) {
       next(error);
     }
@@ -82,7 +88,7 @@ class UsersController {
 
       return res.status(200).json({
         message: 'users retrieved successfully',
-      })
+      });
     } catch (error) {
       next(error);
     }
@@ -100,7 +106,7 @@ class UsersController {
 
       return res.status(200).json({
         message: 'user deleted successfully',
-      })
+      });
     } catch (error) {
       next(error);
     }
@@ -140,7 +146,7 @@ class UsersController {
       isEmailVerifed: {
         type: 'string',
       },
-    }
+    };
 
     validate(body, { properties: fields }, isUpdate);
   }

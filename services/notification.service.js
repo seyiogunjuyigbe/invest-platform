@@ -1,7 +1,8 @@
-// const Notification = require('../models/notification.model');
-// const { sendMail } = require('./mailService');
-const pushNotification = require('@pusher/push-notifications-server');
-const beamsClient = new pushNotification({
+const PushNotification = require('@pusher/push-notifications-server');
+
+const { PUSHER_INSTANCE_ID, PUSHER_SECERT_KEY } = process.env;
+
+const BeamsClient = new PushNotification({
   instanceId: PUSHER_INSTANCE_ID,
   secretKey: PUSHER_SECERT_KEY,
 });
@@ -9,7 +10,7 @@ const beamsClient = new pushNotification({
 module.exports = {
   async sendPushNotification(users = [], title, body) {
     try {
-      let notification = await beamsClient.publishToUsers([...users], {
+      const notification = await BeamsClient.publishToUsers([...users], {
         apns: {
           aps: {
             alert: {
@@ -38,7 +39,7 @@ module.exports = {
   },
   async generateNotificationToken(user) {
     try {
-      let token = await beamsClient.generateToken(user.id);
+      const token = await BeamsClient.generateToken(user.id);
       user.notificationToken = token;
       await user.save();
       return token;
