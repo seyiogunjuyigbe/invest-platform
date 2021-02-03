@@ -7,6 +7,10 @@ const isAuthenticated = require('../middlewares/is-authenticated');
 
 router.get('/', isAuthenticated, adminRoute(), WalletsController.listWallets);
 router.get('/:walletId', isAuthenticated, WalletsController.fetchWallet);
-router.get('/:walletId/histories', isAuthenticated, WalletsController.fetchWalletHistories);
+router.get(
+  '/:walletId/histories',
+  isAuthenticated,
+  WalletsController.fetchWalletHistories
+);
 
 module.exports = router;

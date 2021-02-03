@@ -7,13 +7,13 @@ const logger = require('morgan');
 const { load } = require('js-yaml');
 const { readFileSync } = require('fs');
 
+const ejs = require('ejs');
 const routes = require('./routes');
 const { dev, MONGO_URL } = require('./config/remotes');
 const Database = require('./config/db');
 const cors = require('./config/cors');
 const errorHandler = require('./middlewares/error-handler');
 const { loadDefinitions, loadPaths } = require('./documentations');
-const ejs = require('ejs');
 
 const allowedOrigins = ['https://production.app.com'];
 
