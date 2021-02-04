@@ -59,11 +59,16 @@ userSchema.statics.comparePassword = async (password, userPassword) =>
   bcrypt.compare(password, userPassword);
 
 userSchema.options.toJSON = {
+  virtuals: true,
   transform(doc, ret) {
     delete ret.password;
     return ret;
   },
 };
+
+userSchema.virtual('name').get(function name() {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 userSchema.pre('save', function saveHook(next) {
   if (!this.isModified('password')) return next();
