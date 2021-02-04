@@ -37,7 +37,7 @@
              $ref: "#/definitions/Wallet"             
   /wallets/{walletId}/histories:
     get:
-      summary: fetch wallet histoies
+      summary: fetch wallet histories
       description: fetch wallet histories
       operationId: fetchWalletHistories
       tags:

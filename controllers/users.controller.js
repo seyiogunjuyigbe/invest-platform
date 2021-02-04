@@ -5,6 +5,7 @@ const { validate } = require('../utils/validator');
 const Otp = require('../models/otp.model');
 const { sendMail } = require('../services/mail.service');
 const User = require('../models/user.model');
+const WalletHistory = require('../models/wallet.history.model');
 const { find, findOne } = require('../utils/query');
 
 class UsersController {
@@ -55,6 +56,19 @@ class UsersController {
       return res.status(200).json({
         message: 'wallet retrieved successfully',
         data: wallet,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getWalletHistories(req, res, next) {
+    try {
+      const histories = await find(WalletHistory, req, { user: req.user.id });
+
+      return res.status(200).json({
+        message: 'wallet histories retrieved successfully',
+        data: histories,
       });
     } catch (error) {
       next(error);
