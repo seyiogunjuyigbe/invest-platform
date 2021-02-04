@@ -5,8 +5,9 @@ const { find, findOne } = require('../utils/query');
 class PortfolioController {
   static async createPortfolio(req, res) {
     try {
-      console.log(req.files);
       const { title, category, startDate, endDate } = req.body;
+      let image;
+      let memorandum;
       if (!title) {
         return res
           .status(400)
@@ -17,18 +18,18 @@ class PortfolioController {
           .status(400)
           .json({ success: false, message: 'Category required' });
       }
+      if (req.files) {
+        if (req.files.image) {
+          image = req.files.image[0].path;
+        }
+        if (req.files.memorandum) {
+          memorandum = req.files.memorandum[0].path;
+        }
+      }
       const portfolio = await Portfolio.create({
         ...req.body,
-        image: req.files
-          ? req.files.image
-            ? req.files.image[0].path
-            : null
-          : null,
-        memorandum: req.files
-          ? req.files.memorandum
-            ? req.files.memorandum[0].path
-            : null
-          : null,
+        image,
+        memorandum,
       });
       if (startDate && endDate) {
         if (moment.utc(startDate).diff(moment.utc(endDate)) > 0) {
@@ -55,20 +56,18 @@ class PortfolioController {
           });
         }
       }
+      if (req.files) {
+        if (req.files.image) {
+          req.body.image = req.files.image[0].path;
+        }
+        if (req.files.memorandum) {
+          req.body.memorandum = req.files.memorandum[0].path;
+        }
+      }
       const portfolio = await Portfolio.findByIdAndUpdate(
         req.params.portfolioId,
         {
           ...req.body,
-          image: req.files
-            ? req.files.image
-              ? req.files.image[0].path
-              : null
-            : null,
-          memorandum: req.files
-            ? req.files.memorandum
-              ? req.files.memorandum[0].path
-              : null
-            : null,
         }
       );
       if (!portfolio) {

@@ -25,7 +25,6 @@
     "no-param-reassign": "off",
     "consistent-return": "off",
     "class-methods-use-this": "off",
-    "no-nested-ternary": "off",
     "prettier/prettier": [
       "error",
       {
