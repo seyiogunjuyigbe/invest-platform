@@ -50,7 +50,7 @@
           schema:
             example:
   /auth/profile:
-    post:
+    get:
       summary: Fetch profile of logged in user
       operationId: fetchProfile
       tags:
