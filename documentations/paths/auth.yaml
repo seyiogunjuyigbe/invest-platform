@@ -64,7 +64,8 @@
         200:
           description: Success
           schema:
-            example:
+            type: object
+            properties:
               message: profile retrieved successfully
               data:
                 $ref: "#/definitions/User"
