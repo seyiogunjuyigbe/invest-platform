@@ -223,6 +223,14 @@ class AuthController {
     }
   }
 
+  static async fetchProfile(req, res, next) {
+    try {
+      return res.status(200).json(req.user);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static validateRequest(body, action = 'login') {
     let fields;
 

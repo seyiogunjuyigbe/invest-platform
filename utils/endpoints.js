@@ -1,5 +1,6 @@
 module.exports = function endpointsUtil() {
-  const flwBaseUrl = process.env.FLUTTERWAVE_BASE_URL;
+  const flwBaseUrl =
+    process.env.FLUTTERWAVE_BASE_URL || 'https://api.flutterwave.com/v3';
 
   return {
     raveAuthUrl: `${flwBaseUrl}/payments`,

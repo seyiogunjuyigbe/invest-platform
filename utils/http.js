@@ -29,4 +29,4 @@ class HttpService {
   }
 }
 
-export default new HttpService();
+module.exports = new HttpService();

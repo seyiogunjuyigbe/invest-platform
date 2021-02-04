@@ -1,12 +1,23 @@
 const { omit } = require('lodash');
 
-module.exports = (err, req, res) => {
-  console.error(err);
+// eslint-disable-next-line
+module.exports = function errorHandler(err, req, res, next) {
+  console.error({ err });
   const isProd = process.env.NODE_ENV === 'production';
 
   if (err.code === 'ENOTFOUND') {
     return res.status(500).send({
       message: 'Service not available at the moment. Please try again later',
+    });
+  }
+
+  if (
+    err.message &&
+    err.message.includes('Cast to ObjectId failed for value')
+  ) {
+    return res.status(400).send({
+      message: 'invalid parameter sent',
+      reason: !isProd ? err.message : null,
     });
   }
 

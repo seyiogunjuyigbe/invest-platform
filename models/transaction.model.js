@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 
+const Flutterwave = require('../services/flutterwave.service');
+
+const flutterwave = Flutterwave.getInstance();
+
 const { Schema } = mongoose;
 
 const TransactionSchema = new Schema(
@@ -57,8 +61,24 @@ const TransactionSchema = new Schema(
     timestamps: true,
   }
 );
+
+TransactionSchema.methods.verify = async function verify() {
+  const payment = await flutterwave.verifyTransaction(this);
+
+  if (payment && payment.success) {
+    await this.updateOne({
+      status: 'successful',
+      paymentType: payment.tnx && payment.tnx.payment_type,
+    });
+  } else {
+    await this.updateOne({
+      status: 'failed',
+    });
+  }
+
+  return payment && payment.success;
+};
+
 const Transaction = mongoose.model('Transaction', TransactionSchema);
 
 module.exports = Transaction;
-
-// const

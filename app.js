@@ -38,8 +38,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/v1', routes);
-
 app.get('/swagger.json', (req, res) => {
   const data = {
     paths: loadPaths() || '',
@@ -55,7 +53,11 @@ app.get('/swagger.json', (req, res) => {
   res.send(load(swaggerSchema));
 });
 app.get('/', (req, res) => res.render('index'));
+
+app.use('/api/v1', routes);
+
 app.use(errorHandler);
+
 app.use((req, res) => res.status(404).json({ message: 'URL Not Found' }));
 
 require('./config/passport');

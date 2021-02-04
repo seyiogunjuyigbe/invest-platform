@@ -27,7 +27,7 @@ module.exports = class Flutterwave {
 
     const payload = {
       amount,
-      currency,
+      currency: currency.toUpperCase(),
       tx_ref: reference,
       payment_options: 'card',
       redirect_url: FLUTTERWAVE_REDIRECT_URL,
@@ -159,29 +159,21 @@ module.exports = class Flutterwave {
     return status === 'successful';
   }
 
-  async saveTransaction(tnx, calledFrom = 'app') {
+  async verifyTransaction(tnx) {
     const transaction = tnx;
-
-    function handleError(message) {
-      const baseMessage = `Txn Ref: ${transaction.reference}`;
-      if (calledFrom === 'app') {
-        console.error(`${baseMessage} - ${message}`);
-        throw createError(422, message);
-      } else {
-        console.error(`${baseMessage} - ${message}`);
-        throw new Error(calledFrom);
-      }
-    }
 
     try {
       const validatedPayment = await this.getTransaction(transaction.reference);
 
       if (!validatedPayment) {
-        handleError('An error occured when validating your payment.');
+        throw createError(
+          422,
+          'An error occured when validating your payment.'
+        );
       }
 
       if (validatedPayment.status !== 'success') {
-        handleError(validatedPayment.message);
+        throw createError(422, validatedPayment.message);
       }
 
       if (
@@ -191,7 +183,7 @@ module.exports = class Flutterwave {
           validatedPayment.meta.page_info &&
           !validatedPayment.meta.page_info.total)
       ) {
-        handleError('Transaction not found');
+        throw createError(404, 'Transaction not found');
       }
 
       if (validatedPayment.data && validatedPayment.data.length) {
@@ -199,104 +191,25 @@ module.exports = class Flutterwave {
         const paymentRef = data.tx_ref;
 
         if (data.status === 'success-pending-validation') {
-          handleError('Payment is pending validation.');
+          throw createError(422, 'Payment is pending validation.');
         }
 
         if (transaction.reference !== paymentRef) {
-          // If references don't match
-          handleError(
+          throw createError(
+            422,
             'Invalid payment information associated with the reference.'
           );
         }
 
-        const isSuccessful = this.isSuccessful(data);
-        const payload = {
-          reference: paymentRef,
+        return {
+          success: this.isSuccessful(data),
+          tnx: data,
         };
-
-        if (isSuccessful) {
-          const paymentAmt = Number(data.amount);
-          const transactionAmt = Number(transaction.amount);
-
-          // Check if amount paid is not less that the expected amount on the bill
-          if (paymentAmt < transactionAmt) {
-            console.log(
-              'email',
-              null,
-              'Inconsistent amount',
-              JSON.stringify({
-                paymentAmt,
-                transactionAmt,
-                transaction,
-                data,
-              })
-            );
-            handleError(
-              'Amount paid is less than the expected transaction amount.'
-            );
-          }
-
-          if (transaction.card && !transaction.card.currency) {
-            await transaction.card.update({
-              currency: transaction.currency,
-            });
-          }
-
-          const isNewCard = transaction.paymentType === 'newCard';
-
-          if (isNewCard && data.card) {
-            const { user } = transaction;
-            const card = await user.saveCard(
-              transaction.provider,
-              data.card,
-              transaction.currency
-            );
-            payload.paymentType = 'card';
-            payload.card = card.id;
-          } else if (isNewCard && !data.card) {
-            payload.paymentType = data.payment_entity || data.paymenttype;
-          }
-
-          payload.paymentType =
-            data.payment_entity || data.paymenttype || data.payment_type;
-          payload.status = 'successful';
-        } else {
-          console.log('email', null, null, JSON.stringify(validatedPayment));
-          payload.status = 'failed';
-        }
-
-        const success = await transaction.updateOne(payload);
-
-        if (!success) {
-          handleError('An error occured when saving the payment information');
-        }
-
-        if (payload.status === 'failed') {
-          const message = 'FAILED: Transaction could not be completed.';
-          handleError(
-            `ID(${transaction.id}) - ${message} - ${
-              data.chargemessage || data.gateway_response
-            }`
-          );
-        }
-
-        await transaction.processPayment();
-
-        return true;
       }
 
       return false;
     } catch (error) {
-      console.log(
-        'newrelic',
-        null,
-        'Error saving transactions',
-        JSON.stringify(error)
-      );
-
-      if (error.message === 'hooks') {
-        return;
-      }
+      console.log('Error saving transactions', JSON.stringify(error));
 
       if (
         error &&
@@ -307,7 +220,7 @@ module.exports = class Flutterwave {
         error.response.body.data.code === 'NO TX'
       ) {
         await tnx.update({ status: 'cancelled' });
-        throw createError(404, 'No transaction found');
+        throw createError(404, 'No transaction record on payment processor');
       } else {
         throw error;
       }
