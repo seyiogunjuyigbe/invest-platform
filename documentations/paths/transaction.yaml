@@ -1,0 +1,94 @@
+# Transaction Paths
+  /transactions:
+    get:
+      summary: fetch all user transactions
+      description: fetch all user transactions
+      operationId: fetchTransactions
+      tags:
+      - Transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+             $ref: "#/definitions/Transaction"
+  /transactions/{transactionId}:
+    get:
+      summary: fetch single transaction
+      description: fetch one transaction
+      operationId: fetchTransaction
+      tags:
+      - Transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+             $ref: "#/definitions/Transaction"         
+  /transactions/initiate:
+    post:
+      summary: initiate transaction
+      description: initiate transaction
+      operationId: initiateTransaction
+      tags:
+      - Transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  transaction:
+                    $ref: "#/definitions/Transaction"
+                  auth:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      message:
+                        type: string
+                      data:
+                        type: object
+                        properties:
+                          link:
+                            type: string
+  /transactions/{transactionId}/verify:
+    post:
+      summary: verify transaction
+      description: verify transaction
+      operationId: verifyTransaction
+      tags:
+      - Transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string

@@ -127,4 +127,30 @@
         200:
           description: Success
           schema:
-            $ref: "#/definitions/User"            
+            $ref: "#/definitions/Wallet"
+
+  /users/get-wallet-histories:
+    get:
+      summary: Fetch User Wallet Histories
+      operationId: getUserWalletHistories
+      tags:
+      - Users
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/WalletHistory"
+
+

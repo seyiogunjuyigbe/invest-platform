@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Flutterwave = require('../services/flutterwave.service');
+const User = require('./user.model');
 
 const flutterwave = Flutterwave.getInstance();
 
@@ -41,9 +42,6 @@ const TransactionSchema = new Schema(
       type: Number,
       required: true,
     },
-    paidAt: {
-      type: Date,
-    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -77,6 +75,35 @@ TransactionSchema.methods.verify = async function verify() {
   }
 
   return payment && payment.success;
+};
+
+TransactionSchema.methods.processPayment = async function processPayment() {
+  switch (this.type) {
+    case 'deposit':
+      // eslint-disable-next-line
+      const isSuccessful = await this.verify();
+
+      if (isSuccessful) {
+        const user =
+          this.user && this.user.id
+            ? this.user
+            : await User.findById(this.user);
+        const wallet = await user.getWallet();
+        await wallet.credit(this);
+
+        await this.updateOne({
+          sourceType: 'Transaction',
+          sourceId: this.id,
+          destinationType: 'Wallet',
+          destinationId: wallet.id,
+        });
+      }
+
+      return isSuccessful;
+
+    default:
+      break;
+  }
 };
 
 const Transaction = mongoose.model('Transaction', TransactionSchema);

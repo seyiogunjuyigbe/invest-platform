@@ -50,12 +50,7 @@ class TransactionsController {
         throw createError(400, 'transaction already verified');
       }
 
-      const isSuccessful = await transaction.verify();
-
-      if (isSuccessful) {
-        const wallet = await transaction.user.getWallet();
-        await wallet.credit(transaction);
-      }
+      const isSuccessful = await transaction.processPayment();
 
       return res.status(200).json({
         message: isSuccessful
