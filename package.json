@@ -51,7 +51,7 @@
   "lint-staged": {
     "./**/*.js": [
       "npx prettier --write",
-      "npx eslint './**/*.js' --ignore-path './node_modules' --fix"
+      "npx eslint './**/*.js' --fix --debug"
     ]
   }
 }

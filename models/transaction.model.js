@@ -12,13 +12,7 @@ const TransactionSchema = new Schema(
     status: {
       type: String,
       default: 'pending',
-      enum: [
-        'pending',
-        'successful',
-        'cancelled',
-        'failed',
-        'processing',
-      ],
+      enum: ['pending', 'successful', 'cancelled', 'failed', 'processing'],
     },
     reference: {
       type: String,

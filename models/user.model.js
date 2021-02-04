@@ -52,7 +52,7 @@ const userSchema = new Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 userSchema.statics.comparePassword = async (password, userPassword) =>
@@ -74,16 +74,16 @@ userSchema.pre('save', function saveHook(next) {
   return next();
 });
 
-userSchema.methods.validPassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
+userSchema.methods.validPassword = async function validPassword(password) {
+  return bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.getWallet = async function () {
+userSchema.methods.getWallet = async function getWallet() {
   const wallet = await Wallet.findOne({
     user: this.id,
   });
 
-  return wallet || (await Wallet.create({ user: this.id }));
+  return wallet || Wallet.create({ user: this.id });
 };
 
 const userModel = mongoose.model('User', userSchema);

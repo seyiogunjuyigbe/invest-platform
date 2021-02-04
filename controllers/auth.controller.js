@@ -3,22 +3,23 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
 const { customAlphabet } = require('nanoid');
+const moment = require('moment');
 const { validate } = require('../utils/validator');
 const User = require('../models/user.model');
 const Otp = require('../models/otp.model');
-const { sendMail } = require('../services/mailService');
-const moment = require('moment');
+const { sendMail } = require('../services/mail.service');
+
 class AuthController {
   static async login(req, res, next) {
     try {
       AuthController.validateRequest(req.body, 'login');
 
-      passport.authenticate('local', function (err, user, info) {
+      passport.authenticate('local', (err, user, info) => {
         if (err) return res.status(401).json(err);
 
         if (!user) return res.status(401).json(info);
 
-        let token = jwt.sign(
+        const token = jwt.sign(
           pick(user.toJSON(), [
             '_id',
             'type',
@@ -27,19 +28,19 @@ class AuthController {
             'isEmailVerified',
           ]),
           process.env.JWT_SECRET,
-          { expiresIn: process.env.TOKEN_EXPIRY || 604800 }, // 7 days
+          { expiresIn: process.env.TOKEN_EXPIRY || 604800 } // 7 days
         );
 
-        jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
-          return res.status(200).json({
+        jwt.verify(token, process.env.JWT_SECRET, (error, decoded) =>
+          res.status(200).json({
             message: 'Login successful',
             data: {
               user,
-              token: token,
+              token,
               expiry: decoded.exp,
             },
-          });
-        });
+          })
+        );
       })(req, res);
     } catch (error) {
       next(error);
@@ -50,10 +51,10 @@ class AuthController {
     try {
       AuthController.validateRequest(req.body, 'change-password');
 
-      const user = req.user;
+      const { user } = req;
 
       const isOldPasswordCorrect = await user.validPassword(
-        req.body.oldPassword,
+        req.body.oldPassword
       );
 
       if (!isOldPasswordCorrect) {
@@ -70,52 +71,51 @@ class AuthController {
       next(error);
     }
   }
+
   static async requestPasswordReset(req, res, next) {
     try {
-      let { email } = req.query;
+      const { email } = req.query;
       if (!email) {
         return res.status(400).json({
           message: 'Email address is required',
         });
       }
-      let user = await User.findOne({ email });
+      const user = await User.findOne({ email });
       if (!user) {
         return res.status(403).json({
           message: 'No account found with this email',
         });
-      } else {
-        // expire previous Otps
-        await Otp.updateMany(
-          {
-            user: user.id,
-            isExpired: false,
-            type: 'reset-password',
-          },
-          { isExpired: true },
-        );
-        let expiry = moment.utc().add(1, 'hours');
-        let otp = await Otp.create({
-          otp: customAlphabet('23456789ADFGHJKLMNBVCXZPUYTREWQ', 8)(),
-          type: 'reset-password',
-          user,
-          expiry,
-        });
-        let message = `Use this code to reset your password: ${otp.otp}. This code expires in 1 hour`;
-        await sendMail('Password Reset', user.email, message);
-        return res
-          .status(200)
-          .json({
-            message: 'A reset code has been sent to your email address',
-          });
       }
+      // expire previous Otps
+      await Otp.updateMany(
+        {
+          user: user.id,
+          isExpired: false,
+          type: 'reset-password',
+        },
+        { isExpired: true }
+      );
+      const expiry = moment.utc().add(1, 'hours');
+      const otp = await Otp.create({
+        otp: customAlphabet('23456789ADFGHJKLMNBVCXZPUYTREWQ', 8)(),
+        type: 'reset-password',
+        user,
+        expiry,
+      });
+      const message = `Use this code to reset your password: ${otp.otp}. This code expires in 1 hour`;
+      await sendMail('Password Reset', user.email, message);
+      return res.status(200).json({
+        message: 'A reset code has been sent to your email address',
+      });
     } catch (err) {
       next(err);
     }
   }
+
   static async resetPassword(req, res, next) {
     try {
       AuthController.validateRequest(req.body, 'set-password');
-      let otp = await Otp.findOne({ otp: req.params.otp }).populate('user');
+      const otp = await Otp.findOne({ otp: req.params.otp }).populate('user');
       if (!otp) {
         return res.status(401).json({ message: 'Invalid Recovery Code' });
       }
@@ -130,7 +130,7 @@ class AuthController {
           .status(401)
           .json({ message: 'This code is expired. Please request a new one' });
       }
-      let { user } = otp;
+      const { user } = otp;
       user.password = req.body.password;
       otp.isExpired = true;
       await otp.save();
@@ -142,15 +142,16 @@ class AuthController {
       next(err);
     }
   }
+
   static async resendVerificationToken(req, res, next) {
     try {
-      let { email } = req.query;
+      const { email } = req.query;
       if (!email) {
         return res.status(400).json({
           message: 'Email address is required',
         });
       }
-      let user = await User.findOne({ email });
+      const user = await User.findOne({ email });
       if (!user) {
         return res.status(403).json({
           message: 'No account found with this email',
@@ -165,10 +166,10 @@ class AuthController {
 
       await Otp.updateMany(
         { user: user.id, isExpired: false, type: 'verify-email' },
-        { isExpired: true },
+        { isExpired: true }
       );
-      let expiry = moment.utc().add(1, 'hours');
-      let otp = await Otp.create({
+      const expiry = moment.utc().add(1, 'hours');
+      const otp = await Otp.create({
         otp: customAlphabet('23456789ADFGHJKLMNBVCXZPUYTREWQ', 8)(),
         type: 'verify-email',
         user,
@@ -176,7 +177,7 @@ class AuthController {
       });
       console.log({ otp });
 
-      let message = `Use this code to verify your email ${otp.otp}. This code expires in 1 hour`;
+      const message = `Use this code to verify your email ${otp.otp}. This code expires in 1 hour`;
       await sendMail('Verify your email', user.email, message);
       return res
         .status(200)
@@ -185,9 +186,10 @@ class AuthController {
       next(err);
     }
   }
+
   static async verifyEmail(req, res, next) {
     try {
-      let otp = await Otp.findOne({ otp: req.params.otp }).populate('user');
+      const otp = await Otp.findOne({ otp: req.params.otp }).populate('user');
       if (!otp) {
         return res.status(401).json({ message: 'Invalid Verification Code' });
       }
@@ -202,7 +204,7 @@ class AuthController {
           .status(401)
           .json({ message: 'This code is expired. Please request a new one' });
       }
-      let { user } = otp;
+      const { user } = otp;
       if (user.isEmailVerifed) {
         return res
           .status(409)
@@ -220,6 +222,7 @@ class AuthController {
       next(err);
     }
   }
+
   static validateRequest(body, action = 'login') {
     let fields;
 
@@ -265,6 +268,7 @@ class AuthController {
             required: true,
           },
         };
+        break;
       case 'verification':
         fields = {
           email: {
@@ -272,6 +276,7 @@ class AuthController {
             required: true,
           },
         };
+        break;
       default:
         break;
     }

@@ -6,11 +6,11 @@ const walletSchema = new Schema(
   {
     balance: {
       type: Number,
-      default: 0.00,
+      default: 0.0,
     },
     previousBalance: {
       type: Number,
-      default: 0.00,
+      default: 0.0,
     },
     user: {
       type: Schema.Types.ObjectId,
