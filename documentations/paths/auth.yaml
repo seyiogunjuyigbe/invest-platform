@@ -24,6 +24,10 @@
       tags:
       - Authentication
       parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
         - in: body
           name: oldPassword
           required: true
@@ -45,6 +49,25 @@
           description: Unexpected server error
           schema:
             example:
+  /auth/profile:
+    post:
+      summary: Fetch profile of logged in user
+      operationId: fetchProfile
+      tags:
+      - Authentication
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true     
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              message: profile retrieved successfully
+              data:
+                $ref: "#/definitions/User"
   
   /auth/resend-verification:
     get:
