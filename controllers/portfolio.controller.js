@@ -122,6 +122,43 @@ class PortfolioController {
         type: 'string',
         required: true,
       },
+      description: {
+        type: 'string',
+        required: false,
+      },
+      roi: {
+        type: 'number',
+        required: false,
+      },
+      risk: {
+        type: 'string',
+        required: false,
+        enum: ['low', 'medium', 'high'],
+      },
+      startDate: {
+        type: 'string',
+        required: false,
+      },
+      endDate: {
+        type: 'string',
+        required: false,
+      },
+      minInvestment: {
+        type: 'number',
+        required: false,
+      },
+      maxInvestment: {
+        type: 'number',
+        required: false,
+      },
+      image: {
+        type: 'string',
+        required: false,
+      },
+      memorandum: {
+        type: 'string',
+        required: false,
+      },
     };
 
     validate(body, { properties: fields });
