@@ -1,0 +1,26 @@
+#WPortfolio
+  Portfolio:
+    type: object
+    properties:
+      title:
+        type: string
+      category:
+        type: string
+      description: 
+        type: string
+      startDate:
+        type: string
+      endDate:
+        type: string
+      minInvestment:
+        type: number
+      maxInvestment:
+        type: number
+      risk:
+        type: string
+      image:
+        type: string
+      memorandum:
+        type: string
+      roi:
+        type: number
