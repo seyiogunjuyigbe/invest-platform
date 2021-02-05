@@ -79,7 +79,6 @@
         200:
           description: Success
           schema:
-            example:
              $ref: "#/definitions/Portfolio"
     delete:
       summary: delete portfolio

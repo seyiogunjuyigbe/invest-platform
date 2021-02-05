@@ -8,7 +8,7 @@ cloudinaryConfig();
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'files',
+    folder: 'portfolio_files',
   },
 });
 
