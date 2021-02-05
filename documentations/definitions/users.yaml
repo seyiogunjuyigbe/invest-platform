@@ -28,7 +28,7 @@
         type: string
         minLength: 6
       bvn:
-        type: String
+        type: string
         description: user bvn
       isBVNVerified:
         type: boolean

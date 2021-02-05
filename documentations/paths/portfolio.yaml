@@ -21,8 +21,7 @@
         200:
           description: Success
           schema:
-            example:
-             $ref: "#/definitions/Portfolio"
+            $ref: "#/definitions/Portfolio"
     get:
       summary: fetch all investment portfolios
       description: fetch all investment portfolios
@@ -38,8 +37,7 @@
         200:
           description: Success
           schema:
-            example:
-             $ref: "#/definitions/Portfolio"
+            $ref: "#/definitions/Portfolio"
   /portfolios/{portfolioId}:
     get:
       summary: fetch portfolio
@@ -56,8 +54,7 @@
         200:
           description: Success
           schema:
-            example:
-             $ref: "#/definitions/Portfolio"             
+            $ref: "#/definitions/Portfolio"             
     put:
       summary: update portfolio
       description: update portfolio

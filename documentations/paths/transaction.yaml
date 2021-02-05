@@ -47,6 +47,20 @@
           name: Authorization
           description: Authentication token
           required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: number
+                description: deposit amount
+                required: true
+              authType:
+                type: string
+                enum: [url, manual]
+                description: do you want a pre-generated payment URL or want to manually construct yourself ?
       responses:
         200:
           description: Success
