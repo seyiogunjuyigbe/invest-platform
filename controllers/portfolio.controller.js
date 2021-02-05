@@ -27,12 +27,13 @@ class PortfolioController {
       if (startDate && endDate) {
         if (moment.utc(startDate).diff(moment.utc(endDate), 'days') > 0) {
           return res.status(400).json({
-            status: false,
             message: 'Start date must be earlier than end date',
           });
         }
       }
-      return res.status(200).json({ status: true, portfolio });
+      return res
+        .status(200)
+        .json({ message: 'portfolio created successfully', data: portfolio });
     } catch (err) {
       next(err);
     }
@@ -44,7 +45,6 @@ class PortfolioController {
       if (startDate && endDate) {
         if (moment.utc(startDate).diff(moment.utc(endDate), 'days') > 0) {
           return res.status(400).json({
-            status: false,
             message: 'Start date must be earlier than end date',
           });
         }
@@ -64,16 +64,15 @@ class PortfolioController {
         }
       );
       if (!portfolio) {
-        return res
-          .status(404)
-          .json({ status: false, message: 'Portfolio not found' });
+        return res.status(404).json({ message: 'portfolio not found' });
       }
 
       await portfolio.save();
       const updatedPortfolio = await Portfolio.findById(portfolio._id);
-      return res
-        .status(200)
-        .json({ status: true, portfolio: updatedPortfolio });
+      return res.status(200).json({
+        message: 'portfolio updated successfully',
+        data: updatedPortfolio,
+      });
     } catch (err) {
       next(err);
     }
@@ -84,7 +83,7 @@ class PortfolioController {
       await Portfolio.findByIdAndDelete(req.params.portfolioId);
       return res
         .status(200)
-        .json({ status: true, message: 'Portfolio deleted' });
+        .json({ message: 'portfolio deleted successfully' });
     } catch (err) {
       next(err);
     }
@@ -93,7 +92,10 @@ class PortfolioController {
   static async fetchPortfolios(req, res, next) {
     try {
       const portfolios = await find(Portfolio, req);
-      return res.status(200).json({ status: true, portfolios });
+      return res.status(200).json({
+        message: 'portfolios retrieved successfully',
+        data: portfolios,
+      });
     } catch (err) {
       next(err);
     }
@@ -102,7 +104,9 @@ class PortfolioController {
   static async fetchSinglePortfolio(req, res, next) {
     try {
       const portfolio = await findOne(Portfolio, req);
-      return res.status(200).json({ status: true, portfolio });
+      return res
+        .status(200)
+        .json({ message: 'portfolio retrieved successfully', data: portfolio });
     } catch (err) {
       next(err);
     }
