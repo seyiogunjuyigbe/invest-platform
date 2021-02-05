@@ -1,23 +1,16 @@
 const moment = require('moment');
 const Portfolio = require('../models/portfolio.model');
 const { find, findOne } = require('../utils/query');
+const { validate } = require('../utils/validator');
 
 class PortfolioController {
-  static async createPortfolio(req, res) {
+  static async createPortfolio(req, res, next) {
     try {
-      const { title, category, startDate, endDate } = req.body;
+      PortfolioController.validateRequest(req.body);
+      const { startDate, endDate } = req.body;
       let image;
       let memorandum;
-      if (!title) {
-        return res
-          .status(400)
-          .json({ success: false, message: 'Title required' });
-      }
-      if (!category) {
-        return res
-          .status(400)
-          .json({ success: false, message: 'Category required' });
-      }
+
       if (req.files) {
         if (req.files.image) {
           image = req.files.image[0].path;
@@ -32,26 +25,26 @@ class PortfolioController {
         memorandum,
       });
       if (startDate && endDate) {
-        if (moment.utc(startDate).diff(moment.utc(endDate)) > 0) {
+        if (moment.utc(startDate).diff(moment.utc(endDate), 'days') > 0) {
           return res.status(400).json({
-            success: false,
+            status: false,
             message: 'Start date must be earlier than end date',
           });
         }
       }
-      return res.status(200).json({ success: true, portfolio });
+      return res.status(200).json({ status: true, portfolio });
     } catch (err) {
-      return res.status(500).json({ success: false, error: err.message });
+      next(err);
     }
   }
 
-  static async updatePortfolio(req, res) {
+  static async updatePortfolio(req, res, next) {
     try {
       const { startDate, endDate } = req.body;
       if (startDate && endDate) {
-        if (moment.utc(startDate).diff(moment.utc(endDate)) > 0) {
+        if (moment.utc(startDate).diff(moment.utc(endDate), 'days') > 0) {
           return res.status(400).json({
-            success: false,
+            status: false,
             message: 'Start date must be earlier than end date',
           });
         }
@@ -73,46 +66,61 @@ class PortfolioController {
       if (!portfolio) {
         return res
           .status(404)
-          .json({ success: false, message: 'Portfolio not found' });
+          .json({ status: false, message: 'Portfolio not found' });
       }
 
       await portfolio.save();
       const updatedPortfolio = await Portfolio.findById(portfolio._id);
       return res
         .status(200)
-        .json({ success: true, portfolio: updatedPortfolio });
+        .json({ status: true, portfolio: updatedPortfolio });
     } catch (err) {
-      return res.status(500).json({ success: false, error: err.message });
+      next(err);
     }
   }
 
-  static async deletePortfolio(req, res) {
+  static async deletePortfolio(req, res, next) {
     try {
       await Portfolio.findByIdAndDelete(req.params.portfolioId);
       return res
         .status(200)
-        .json({ success: true, message: 'Portfolio deleted' });
+        .json({ status: true, message: 'Portfolio deleted' });
     } catch (err) {
-      return res.status(500).json({ success: false, error: err.message });
+      next(err);
     }
   }
 
-  static async fetchPortfolios(req, res) {
+  static async fetchPortfolios(req, res, next) {
     try {
       const portfolios = await find(Portfolio, req);
-      return res.status(200).json({ success: true, portfolios });
+      return res.status(200).json({ status: true, portfolios });
     } catch (err) {
-      return res.status(500).json({ success: false, error: err.message });
+      next(err);
     }
   }
 
-  static async fetchSinglePortfolio(req, res) {
+  static async fetchSinglePortfolio(req, res, next) {
     try {
       const portfolio = await findOne(Portfolio, req);
-      return res.status(200).json({ success: true, portfolio });
+      return res.status(200).json({ status: true, portfolio });
     } catch (err) {
-      return res.status(500).json({ success: false, error: err.message });
+      next(err);
     }
+  }
+
+  static validateRequest(body) {
+    const fields = {
+      title: {
+        type: 'string',
+        required: true,
+      },
+      category: {
+        type: 'string',
+        required: true,
+      },
+    };
+
+    validate(body, { properties: fields });
   }
 }
 module.exports = PortfolioController;
