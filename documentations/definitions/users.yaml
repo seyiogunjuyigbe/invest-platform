@@ -33,3 +33,23 @@
       isBVNVerified:
         type: boolean
         example: false
+      dateOfBirth: 
+          type: string
+      stateOfOrigin: 
+        type: string
+      gender: 
+        type: string
+      nationality: 
+        type: string
+      occupation: 
+        type: string
+      residentialAddress: 
+        type: string
+      cityOfResidence: 
+        type: string
+      countryOfResidence: 
+        type: string
+      identificationDoc: 
+        type: string
+      identificationDocNumber: 
+        type: string

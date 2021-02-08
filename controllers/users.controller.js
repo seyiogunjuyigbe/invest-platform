@@ -7,6 +7,8 @@ const { sendMail } = require('../services/mail.service');
 const User = require('../models/user.model');
 const WalletHistory = require('../models/wallet.history.model');
 const { find, findOne } = require('../utils/query');
+const BankAccount = require('../models/bank.account.model');
+const { response } = require('../middlewares/api_response');
 
 class UsersController {
   static async createUser(req, res, next) {
@@ -126,6 +128,15 @@ class UsersController {
     }
   }
 
+  static async fetchBankAccount(req, res, next) {
+    try {
+      const account = await findOne(BankAccount, req, { user: req.user.id });
+      return response(res, 200, 'bank account fetched successfully', account);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static validateRequest(body, isUpdate, isUserSignup) {
     const fields = {
       type: {
@@ -158,6 +169,36 @@ class UsersController {
         required: !isUpdate,
       },
       isEmailVerifed: {
+        type: 'string',
+      },
+      dateOfBirth: {
+        type: 'string',
+      },
+      stateOfOrigin: {
+        type: 'string',
+      },
+      gender: {
+        type: 'string',
+      },
+      nationality: {
+        type: 'string',
+      },
+      occupation: {
+        type: 'string',
+      },
+      residentialAddress: {
+        type: 'string',
+      },
+      cityOfResidence: {
+        type: 'string',
+      },
+      countryOfResidence: {
+        type: 'string',
+      },
+      identificationDoc: {
+        type: 'string',
+      },
+      identificationDocNumber: {
         type: 'string',
       },
     };

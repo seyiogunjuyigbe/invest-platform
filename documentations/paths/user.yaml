@@ -152,5 +152,25 @@
                 type: array
                 items:
                   $ref: "#/definitions/WalletHistory"
-
-
+  /users/get-bank-account:
+    get:
+      summary: Fetch user bank account
+      operationId: getUserBankAccount
+      tags:
+      - Users
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                $ref: "#/definitions/BankAccount"

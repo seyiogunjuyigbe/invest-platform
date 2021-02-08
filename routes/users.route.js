@@ -14,6 +14,11 @@ router.get(
   isAuthenticated,
   UsersController.getWalletHistories
 );
+router.get(
+  '/get-bank-account',
+  isAuthenticated,
+  UsersController.fetchBankAccount
+);
 router.get('/:userId', isAuthenticated, UsersController.fetchUser);
 router.put('/:userId', isAuthenticated, UsersController.updateUser);
 router.delete(

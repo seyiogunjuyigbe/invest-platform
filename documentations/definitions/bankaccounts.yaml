@@ -1,0 +1,16 @@
+#BankAccount
+  BankAccount:
+    type: object
+    properties:
+      accountName:
+        type: string
+      accountNumber:
+        type: string
+      user:
+        type: object
+      bankName:
+        type: string
+      bankCode: 
+        type: string
+      bvn:
+        type: string

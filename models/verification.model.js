@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const verificationSchema = new Schema(
   {
-    title: String,
-    type: {
+    category: {
       type: String,
       enum: ['bvn', 'document'],
     },
+    documentNumber: String,
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -22,6 +22,7 @@ const verificationSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
+    remarks: String,
   },
   { timestamps: true }
 );

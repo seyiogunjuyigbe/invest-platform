@@ -227,6 +227,22 @@ module.exports = class Flutterwave {
     }
   }
 
+  async verifyBvn(bvn) {
+    try {
+      const url = `${this.endpoints.raveValidateBvn}/${bvn}`;
+      const headers = {
+        Authorization: `Bearer ${this.config.secretKey}`,
+      };
+      const response = await http.get(url, headers);
+      if (response && response.data) {
+        return response.data.status === 'success' ? response.data : false;
+      }
+      return false;
+    } catch (error) {
+      return false;
+    }
+  }
+
   static getInstance() {
     if (!Flutterwave.instance) {
       Flutterwave.instance = new Flutterwave();
