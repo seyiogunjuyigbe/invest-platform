@@ -135,6 +135,11 @@ class PortfolioController {
         required: false,
         enum: ['low', 'medium', 'high'],
       },
+      disbursementType: {
+        type: 'string',
+        required: true,
+        enum: ['monthly', 'maturity'],
+      },
       startDate: {
         type: 'string',
         required: false,

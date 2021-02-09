@@ -20,7 +20,7 @@ router.delete(
   '/:userId',
   isAuthenticated,
   adminRoute({ type: 'superadmin' }),
-  UsersController.updateUser
+  UsersController.deleteUser
 );
 
 module.exports = router;
