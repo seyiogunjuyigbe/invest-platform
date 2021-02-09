@@ -15,10 +15,14 @@ const cors = require('./config/cors');
 const errorHandler = require('./middlewares/error-handler');
 const { loadDefinitions, loadPaths } = require('./documentations');
 
-const allowedOrigins = ['https://production.app.com'];
+const allowedOrigins = [
+  'https://production.app.com',
+  'http://black-gold.herokuapp.com/',
+  'https://black-gold.herokuapp.com/',
+];
 
 if (dev) {
-  const allowedDevOrigins = ['http://localhost:8882'];
+  const allowedDevOrigins = ['http://localhost:8882', 'http://localhost:3000'];
   allowedOrigins.push(...allowedDevOrigins);
 }
 
