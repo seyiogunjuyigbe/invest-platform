@@ -8,10 +8,10 @@ const { load } = require('js-yaml');
 const { readFileSync } = require('fs');
 
 const ejs = require('ejs');
+const cors = require('cors');
 const routes = require('./routes');
 const { dev, MONGO_URL } = require('./config/remotes');
 const Database = require('./config/db');
-const cors = require('./config/cors');
 const errorHandler = require('./middlewares/error-handler');
 const { loadDefinitions, loadPaths } = require('./documentations');
 
@@ -29,13 +29,13 @@ if (dev) {
 new Database().connect(MONGO_URL);
 
 const app = express();
+app.use(cors());
 app.set('views', path.join(__dirname, 'public'));
 app.set('view engine', 'pug');
 app.use(bParser.json({ limit: '50mb' }));
 app.use(
   bParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 500000 })
 );
-app.use(cors(allowedOrigins));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
