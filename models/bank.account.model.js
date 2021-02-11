@@ -7,10 +7,13 @@ const bankAccountSchema = new Schema(
     accountNumber: String,
     bankName: String,
     bankCode: String,
-    bvn: String,
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

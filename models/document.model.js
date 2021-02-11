@@ -1,12 +1,8 @@
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
-const verificationSchema = new Schema(
+const documentSchema = new Schema(
   {
-    category: {
-      type: String,
-      enum: ['bvn', 'document'],
-    },
     documentNumber: String,
     user: {
       type: Schema.Types.ObjectId,
@@ -15,7 +11,7 @@ const verificationSchema = new Schema(
     document: String,
     status: {
       type: String,
-      enum: ['pending', 'approved', 'declined'],
+      enum: ['pending', 'verified', 'declined'],
       default: 'pending',
     },
     actionBy: {
@@ -26,4 +22,4 @@ const verificationSchema = new Schema(
   },
   { timestamps: true }
 );
-module.exports = mongoose.model('Verification', verificationSchema);
+module.exports = mongoose.model('Document', documentSchema);

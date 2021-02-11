@@ -137,19 +137,24 @@ module.exports = class Flutterwave {
   }
 
   async verifyAccount(options) {
-    const url = this.endpoints.verifyAccount;
+    const url = this.endpoints.raveVerifyAccount;
     const params = {
-      recipientaccount: options.bankAccount,
-      destbankcode: options.bankCode,
-      PBFPubKey: this.config.publicKey,
+      account_number: options.bankAccount,
+      account_bank: options.bankCode,
     };
-    const response = await http.post(url, params);
+    const response = await http.post(url, params, {
+      Authorization: `Bearer ${this.config.secretKey}`,
+    });
 
     if (response && response.data) {
       const { status } = response.data;
       const responseCode = response.data.data.responsecode;
 
-      return status === 'success' && responseCode === '00';
+      if (status === 'success' && responseCode === '00') {
+        // account name needed from response
+        return response.data.data;
+      }
+      return false;
     }
 
     return false;

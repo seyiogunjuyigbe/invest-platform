@@ -8,6 +8,9 @@ const User = require('../models/user.model');
 const WalletHistory = require('../models/wallet.history.model');
 const { find, findOne } = require('../utils/query');
 const BankAccount = require('../models/bank.account.model');
+const flutterwaveService = require('../services/flutterwave.service');
+
+const flutterwave = flutterwaveService.getInstance();
 const { response } = require('../middlewares/api_response');
 
 class UsersController {
@@ -137,36 +140,224 @@ class UsersController {
     }
   }
 
-  static validateRequest(body, isUpdate, isUserSignup) {
+  static async fetchAllAccounts(req, res, next) {
+    try {
+      const accounts = await find(BankAccount, req, { user: req.user.id });
+      return response(res, 200, 'bank accounts fetched successfully', accounts);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyBvn(req, res, next) {
+    UsersController.validateRequest(req.body, false, false, true);
+    try {
+      const { bvn } = req.body;
+      const duplicateUser = await User.findOne({ bvn });
+      if (duplicateUser) {
+        return response(
+          res,
+          400,
+          'this bvn is already matched with another user'
+        );
+      }
+      // attempt bvn verification
+      const bvnDetails = await flutterwave.verifyBvn(bvn);
+
+      if (!bvnDetails) {
+        // bvn not resolved at all
+        return response(
+          res,
+          400,
+          'we could not verify your bvn. please check your details and try again'
+        );
+      }
+      const {
+        first_name,
+        last_name,
+        middle_name,
+        date_of_birth,
+        phone_number,
+      } = bvnDetails.data;
+      req.user.set({
+        bvn,
+        bvnFirstName: first_name,
+        bvnMiddleName: middle_name,
+        bvnLastName: last_name,
+        bvnDateOfBirth: date_of_birth,
+        bvnPhoneNumber: phone_number,
+      });
+      const check = () => {
+        const { firstName, lastName, dateOfBirth } = req.user;
+        return (
+          (first_name.toLowerCase() !== firstName.toLowercase() &&
+            first_name.toLowerCase() !== lastName.toLowercase()) ||
+          (last_name.toLowerCase() !== lastName.toLowercase() &&
+            last_name.toLowerCase() !== firstName.toLowercase()) ||
+          (middle_name.toLowerCase() !== lastName.toLowercase() &&
+            middle_name.toLowerCase() !== firstName.toLowercase()) ||
+          !moment.utc(date_of_birth).isSame(dateOfBirth, 'day')
+        );
+      };
+
+      if (check()) {
+        // bvn resolved but not a perfect match;
+        // TODO: send notification to admin
+        await req.user.save();
+        return response(
+          res,
+          400,
+          'we coud not match your bvn with your records. please contact support'
+        );
+      }
+      // bvn is a perfect match
+      req.user.isBVNVerified = true;
+      await req.user.save();
+      response(res, 200, 'bvn verified successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyUserBvnAsAdmin(req, res, next) {
+    try {
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return response(res, 404, 'user not found');
+      }
+      user.isBVNVerified = !![true, 'true'].includes(req.body.status);
+      await user.save();
+      return response(res, 200, 'user bvn verification status updated', user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async addBankAccount(req, res, next) {
+    try {
+      UsersController.validateRequest(req.body, false, false, false, true);
+      const { bankCode, bankName } = req.body;
+      const verifyAcct = await flutterwave.verifyAccount(req.body);
+      if (!verifyAcct) {
+        return response(
+          res,
+          400,
+          'your bank details coud not be verified. please doube check and try again'
+        );
+        // bank account not resolved
+      }
+      const newAccount = await BankAccount.create({
+        accountNumber: verifyAcct.account_number,
+        accountName: verifyAcct.account_name,
+        bankCode,
+        user: req.user.id,
+        bankName,
+      });
+      req.user.bankAccounts.addToSet(newAccount);
+      await req.user.save();
+      return response(res, 200, 'bank account added successfully', newAccount);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async removeBankAccount(req, res, next) {
+    try {
+      const bankAccount = await BankAccount.findOne({
+        _id: req.params.bankId,
+        user: req.user.id,
+      });
+      if (!bankAccount) {
+        return response(res, 404, 'bank account not found');
+      }
+      if (bankAccount.isDefault && req.user.bankAccounts.length === 1) {
+        // user is attempting to remove only (deault) bank account
+        return response(
+          res,
+          400,
+          'sorry, you can not remove your default bank account'
+        );
+      }
+      await BankAccount.findByIdAndDelete(req.params.bankId);
+      req.user.bankAccounts.pull(bankAccount._id);
+      await req.user.save();
+      return response(res, 200, 'bank account removed successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async setDefaultAcct(req, res, next) {
+    try {
+      const bankAccount = await BankAccount.findOne({
+        _id: req.params.bankId,
+        user: req.user.id,
+      });
+      if (!bankAccount) {
+        return response(res, 404, 'bank account not found');
+      }
+      // set all others as not default
+      await BankAccount.updateMany({ user: req.user.id }, { isDefault: false });
+      bankAccount.isDefault = true;
+      await bankAccount.save();
+      return response(res, 200, 'bank account set as default successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static validateRequest(
+    body,
+    isUpdate,
+    isUserSignup,
+    isBvnUpdate = false,
+    isBankUpdate = false
+  ) {
     const fields = {
       type: {
         type: 'string',
-        required: !isUpdate && !isUserSignup,
+        required: !isUpdate && !isUserSignup && !isBvnUpdate && !isBankUpdate,
         enum: ['investor', 'admin', 'superadmin'],
       },
       role: {
         type: 'string',
-        required: !isUpdate && !isUserSignup,
+        required: !isUpdate && !isUserSignup && !isBvnUpdate && !isBankUpdate,
         enum: ['finance', 'non-finance', 'none'],
       },
       firstName: {
         type: 'string',
-        required: !isUpdate,
+        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
       },
       lastName: {
         type: 'string',
-        required: !isUpdate,
+        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
       },
       email: {
         type: 'string',
-        required: !isUpdate,
+        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
       },
       phone: {
         type: 'string',
       },
       password: {
         type: 'string',
-        required: !isUpdate,
+        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+      },
+      bvn: {
+        type: 'string',
+        required: isBvnUpdate,
+      },
+      bankAccount: {
+        type: 'string',
+        required: isBankUpdate,
+      },
+      bankCode: {
+        type: 'string',
+        required: isBankUpdate,
+      },
+      bankName: {
+        type: 'string',
+        required: isBankUpdate,
       },
       isEmailVerifed: {
         type: 'string',

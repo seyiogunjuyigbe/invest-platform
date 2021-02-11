@@ -1,7 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
-const VerificationCtrl = require('../controllers/verification.controller');
+const DocCtrl = require('../controllers/document.controller');
 const adminRoute = require('../middlewares/admin');
 const isAuthenticated = require('../middlewares/is-authenticated');
 const upload = require('../middlewares/multer');
@@ -10,24 +10,29 @@ router.post(
   '/',
   isAuthenticated,
   upload.single('document'),
-  VerificationCtrl.requestverificationAsUser
+  DocCtrl.requestverificationAsUser
 );
+
+router.get('/', isAuthenticated, DocCtrl.viewMyDocs);
 router.get(
-  '/',
+  '/requests',
   isAuthenticated,
   adminRoute(),
-  VerificationCtrl.viewVerificationRequests
+  DocCtrl.viewVerificationRequests
 );
+router.get('/:docId', isAuthenticated, DocCtrl.viewSingleDoc);
+router.delete('/:docId', isAuthenticated, DocCtrl.deleteMyDoc);
+
 router.get(
-  '/:requestId',
+  '/requests/:docId',
   isAuthenticated,
   adminRoute(),
-  VerificationCtrl.viewVerificationRequest
+  DocCtrl.viewVerificationRequest
 );
 router.put(
-  '/:requestId',
+  '/requests/:docId',
   isAuthenticated,
   adminRoute(),
-  VerificationCtrl.updateVerificationRequest
+  DocCtrl.updateVerificationRequest
 );
 module.exports = router;

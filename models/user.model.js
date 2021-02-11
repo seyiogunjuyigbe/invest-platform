@@ -63,6 +63,17 @@ const userSchema = new Schema(
     countryOfResidence: String,
     identificationDoc: String,
     identificationDocNumber: String,
+    bvnFirstName: String,
+    bvnMiddleName: String,
+    bvnLastName: String,
+    bvnDateOfBirth: String,
+    bvnPhoneNumber: String,
+    bankAccounts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'BankAccount',
+      },
+    ],
   },
   {
     timestamps: true,
