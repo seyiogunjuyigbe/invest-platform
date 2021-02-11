@@ -18,11 +18,5 @@ const bankAccountSchema = new Schema(
   },
   { timestamps: true }
 );
-bankAccountSchema.options.toJSON = {
-  transform(doc, ret) {
-    delete ret.bvn;
-    return ret;
-  },
-};
 
 module.exports = mongoose.model('BankAccount', bankAccountSchema);

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const Wallet = require('./wallet.model');
 
@@ -87,6 +88,7 @@ userSchema.options.toJSON = {
   virtuals: true,
   transform(doc, ret) {
     delete ret.password;
+    ret.bvn = jwt.decode(ret.bvn);
     return ret;
   },
 };
@@ -101,6 +103,12 @@ userSchema.pre('save', function saveHook(next) {
   const salt = bcrypt.genSaltSync(saltRounds);
   const hash = bcrypt.hashSync(this.password, salt);
   this.password = hash;
+  return next();
+});
+
+userSchema.pre('save', function saveBvn(next) {
+  if (!this.isModified('bvn')) return next();
+  this.bvn = jwt.sign(this.bvn, process.env.JWT_SECRET);
   return next();
 });
 

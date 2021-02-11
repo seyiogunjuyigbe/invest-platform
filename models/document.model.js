@@ -8,7 +8,7 @@ const documentSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
-    document: String,
+    documentUrl: String,
     status: {
       type: String,
       enum: ['pending', 'verified', 'declined'],

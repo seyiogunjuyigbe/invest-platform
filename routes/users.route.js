@@ -14,23 +14,6 @@ router.get(
   isAuthenticated,
   UsersController.getWalletHistories
 );
-router.post('/bank-accounts', isAuthenticated, UsersController.addBankAccount);
-router.get('/bank-accounts', isAuthenticated, UsersController.fetchAllAccounts);
-router.get(
-  '/bank-accounts/:bankId',
-  isAuthenticated,
-  UsersController.fetchBankAccount
-);
-router.delete(
-  '/bank-accounts/:bankId',
-  isAuthenticated,
-  UsersController.removeBankAccount
-);
-router.get(
-  '/bank-accounts/:bankId/set-default',
-  isAuthenticated,
-  UsersController.setDefaultAcct
-);
 router.post('/bvn', isAuthenticated, UsersController.verifyBvn);
 router.get(
   '/verify-bvn',

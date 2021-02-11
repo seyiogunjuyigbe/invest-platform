@@ -3,10 +3,10 @@ const { find, findOne } = require('../utils/query');
 const { validate } = require('../utils/validator');
 const { response } = require('../middlewares/api_response');
 
-class VerificationController {
-  static async requestverificationAsUser(req, res, next) {
+class DocumentController {
+  static async submitDocument(req, res, next) {
     try {
-      VerificationController.validateRequest(req.body, 'request');
+      DocumentController.validateRequest(req.body, 'request');
       const existingDoc = await Document.findOne({
         user: req.user.id,
         status: 'pending',
@@ -19,7 +19,7 @@ class VerificationController {
       }
       const verification = await Document.create({
         ...req.body,
-        document: req.file.path,
+        documentUrl: req.file.path,
         user: req.user.id,
       });
       return response(
@@ -33,7 +33,7 @@ class VerificationController {
     }
   }
 
-  static async viewVerificationRequests(req, res, next) {
+  static async viewDocuments(req, res, next) {
     try {
       const requests = await find(Document, req);
       return response(
@@ -47,7 +47,7 @@ class VerificationController {
     }
   }
 
-  static async viewVerificationRequest(req, res, next) {
+  static async viewDocument(req, res, next) {
     try {
       const request = await findOne(Document, req);
       return response(
@@ -61,9 +61,9 @@ class VerificationController {
     }
   }
 
-  static async updateVerificationRequest(req, res, next) {
+  static async updateDocument(req, res, next) {
     try {
-      VerificationController.validateRequest(req.body, 'update');
+      DocumentController.validateRequest(req.body, 'update');
       const { status, remarks } = req.body;
       const thisDoc = await Document.findById(req.params.docId).populate(
         'user'
@@ -137,15 +137,7 @@ class VerificationController {
           status: {
             type: 'string',
             required: true,
-            enum: [
-              'pending',
-              'verified',
-              'declined',
-              'true',
-              'false',
-              true,
-              false,
-            ],
+            enum: ['pending', 'verified', 'declined'],
           },
           remarks: {
             type: 'string',
@@ -160,4 +152,4 @@ class VerificationController {
     validate(body, { properties: fields });
   }
 }
-module.exports = VerificationController;
+module.exports = DocumentController;

@@ -10,16 +10,11 @@ router.post(
   '/',
   isAuthenticated,
   upload.single('document'),
-  DocCtrl.requestverificationAsUser
+  DocCtrl.submitDocument
 );
 
 router.get('/', isAuthenticated, DocCtrl.viewMyDocs);
-router.get(
-  '/requests',
-  isAuthenticated,
-  adminRoute(),
-  DocCtrl.viewVerificationRequests
-);
+router.get('/requests', isAuthenticated, DocCtrl.viewMyDocs);
 router.get('/:docId', isAuthenticated, DocCtrl.viewSingleDoc);
 router.delete('/:docId', isAuthenticated, DocCtrl.deleteMyDoc);
 
@@ -27,12 +22,12 @@ router.get(
   '/requests/:docId',
   isAuthenticated,
   adminRoute(),
-  DocCtrl.viewVerificationRequest
+  DocCtrl.viewDocuments
 );
 router.put(
   '/requests/:docId',
   isAuthenticated,
   adminRoute(),
-  DocCtrl.updateVerificationRequest
+  DocCtrl.updateDocument
 );
 module.exports = router;
