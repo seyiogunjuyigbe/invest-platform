@@ -12,5 +12,3 @@
         type: string
       bankCode: 
         type: string
-      bvn:
-        type: string
