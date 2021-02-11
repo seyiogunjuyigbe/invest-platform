@@ -1,4 +1,5 @@
-const { omit, startCase, pluralize } = require('lodash');
+const { omit, startCase } = require('lodash');
+const pluralize = require('pluralize');
 
 // eslint-disable-next-line
 module.exports = function errorHandler(err, req, res, next) {
