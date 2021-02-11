@@ -56,7 +56,7 @@ class BankController {
   static async removeBankAccount(req, res, next) {
     try {
       const bankAccount = await BankAccount.findOne({
-        _id: req.params.bankId,
+        _id: req.params.bankAccountId,
         user: req.user.id,
       });
       if (!bankAccount) {
@@ -70,7 +70,7 @@ class BankController {
           'sorry, you can not remove your default bank account'
         );
       }
-      await BankAccount.findByIdAndDelete(req.params.bankId);
+      await BankAccount.findByIdAndDelete(req.params.bankAccountId);
       req.user.bankAccounts.pull(bankAccount._id);
       await req.user.save();
       return response(res, 200, 'bank account removed successfully');
@@ -82,7 +82,7 @@ class BankController {
   static async setDefaultAcct(req, res, next) {
     try {
       const bankAccount = await BankAccount.findOne({
-        _id: req.params.bankId,
+        _id: req.params.bankAccountId,
         user: req.user.id,
       });
       if (!bankAccount) {

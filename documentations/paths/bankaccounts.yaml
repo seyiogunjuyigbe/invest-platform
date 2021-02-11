@@ -80,7 +80,7 @@
                 type: array
                 items:
                   $ref: "#/definitions/BankAccount"  
-  /bank-accounts/{bankId}:
+  /bank-accounts/{bankAccountId}:
     get:
       summary: Fetch user bank account
       operationId: getBankAccount
@@ -125,7 +125,7 @@
                 type: object
                 schema:
                   $ref: "#/definitions/BankAccount"   
-  /bank-accounts/:bankId/set-default:          
+  /bank-accounts/:bankAccountId/set-default:          
     get:
       summary: Set bank account as default
       operationId: defaultBankAccount
