@@ -97,7 +97,7 @@ class AuthController {
       );
       const expiry = moment.utc().add(1, 'hours');
       const otp = await Otp.create({
-        otp: customAlphabet('23456789ADFGHJKLMNBVCXZPUYTREWQ', 8)(),
+        otp: customAlphabet('0123456789', 6)(),
         type: 'reset-password',
         user,
         expiry,
@@ -170,7 +170,7 @@ class AuthController {
       );
       const expiry = moment.utc().add(1, 'hours');
       const otp = await Otp.create({
-        otp: customAlphabet('23456789ADFGHJKLMNBVCXZPUYTREWQ', 8)(),
+        otp: customAlphabet('0123456789', 6)(),
         type: 'verify-email',
         user,
         expiry,
