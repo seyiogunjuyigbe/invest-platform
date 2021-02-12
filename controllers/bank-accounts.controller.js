@@ -7,6 +7,15 @@ const flutterwave = flutterwaveService.getInstance();
 const { response } = require('../middlewares/api_response');
 
 class BankController {
+  static async fetchBanks(req, res, next) {
+    try {
+      const banks = await flutterwave.getAllBanks();
+      return response(res, 200, 'banks fetched successfully', banks);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async fetchBankAccount(req, res, next) {
     try {
       const account = await findOne(BankAccount, req, { user: req.user.id });
