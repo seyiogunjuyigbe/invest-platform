@@ -7,6 +7,10 @@ const { sendMail } = require('../services/mail.service');
 const User = require('../models/user.model');
 const WalletHistory = require('../models/wallet.history.model');
 const { find, findOne } = require('../utils/query');
+const flutterwaveService = require('../services/flutterwave.service');
+
+const flutterwave = flutterwaveService.getInstance();
+const { response } = require('../middlewares/api_response');
 
 class UsersController {
   static async createUser(req, res, next) {
@@ -126,38 +130,174 @@ class UsersController {
     }
   }
 
-  static validateRequest(body, isUpdate, isUserSignup) {
+  static async verifyBvn(req, res, next) {
+    UsersController.validateRequest(req.body, false, false, true);
+    try {
+      const { bvn } = req.body;
+      const duplicateUser = await User.findOne({ bvn });
+      if (duplicateUser) {
+        return response(
+          res,
+          400,
+          'this bvn is already matched with another user'
+        );
+      }
+      // attempt bvn verification
+      const bvnDetails = await flutterwave.verifyBvn(bvn);
+
+      if (!bvnDetails) {
+        // bvn not resolved at all
+        return response(
+          res,
+          400,
+          'we could not verify your bvn. please check your details and try again'
+        );
+      }
+      const {
+        first_name,
+        last_name,
+        middle_name,
+        date_of_birth,
+        phone_number,
+      } = bvnDetails.data;
+      req.user.set({
+        bvn,
+        bvnFirstName: first_name,
+        bvnMiddleName: middle_name,
+        bvnLastName: last_name,
+        bvnDateOfBirth: date_of_birth,
+        bvnPhoneNumber: phone_number,
+      });
+      const check = () => {
+        const { firstName, lastName, dateOfBirth } = req.user;
+        return (
+          (first_name.toLowerCase() !== firstName.toLowercase() &&
+            first_name.toLowerCase() !== lastName.toLowercase()) ||
+          (last_name.toLowerCase() !== lastName.toLowercase() &&
+            last_name.toLowerCase() !== firstName.toLowercase()) ||
+          (middle_name.toLowerCase() !== lastName.toLowercase() &&
+            middle_name.toLowerCase() !== firstName.toLowercase()) ||
+          !moment.utc(date_of_birth).isSame(dateOfBirth, 'day')
+        );
+      };
+
+      if (check()) {
+        // bvn resolved but not a perfect match;
+        // TODO: send notification to admin
+        await req.user.save();
+        return response(
+          res,
+          400,
+          'we coud not match your bvn with your records. please contact support'
+        );
+      }
+      // bvn is a perfect match
+      req.user.isBVNVerified = true;
+      await req.user.save();
+      response(res, 200, 'bvn verified successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyUserBvnAsAdmin(req, res, next) {
+    try {
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return response(res, 404, 'user not found');
+      }
+      user.isBVNVerified = !![true, 'true'].includes(req.body.status);
+      await user.save();
+      return response(res, 200, 'user bvn verification status updated', user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static validateRequest(
+    body,
+    isUpdate,
+    isUserSignup,
+    isBvnUpdate = false,
+    isBankUpdate = false
+  ) {
     const fields = {
       type: {
         type: 'string',
-        required: !isUpdate && !isUserSignup,
+        required: !isUpdate && !isUserSignup && !isBvnUpdate && !isBankUpdate,
         enum: ['investor', 'admin', 'superadmin'],
       },
       role: {
         type: 'string',
-        required: !isUpdate && !isUserSignup,
+        required: !isUpdate && !isUserSignup && !isBvnUpdate && !isBankUpdate,
         enum: ['finance', 'non-finance', 'none'],
       },
       firstName: {
         type: 'string',
-        required: !isUpdate,
+        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
       },
       lastName: {
         type: 'string',
-        required: !isUpdate,
+        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
       },
       email: {
         type: 'string',
-        required: !isUpdate,
+        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
       },
       phone: {
         type: 'string',
       },
       password: {
         type: 'string',
-        required: !isUpdate,
+        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+      },
+      bvn: {
+        type: 'string',
+        required: isBvnUpdate,
+      },
+      bankAccount: {
+        type: 'string',
+        required: isBankUpdate,
+      },
+      bankCode: {
+        type: 'string',
+        required: isBankUpdate,
+      },
+      bankName: {
+        type: 'string',
+        required: isBankUpdate,
       },
       isEmailVerifed: {
+        type: 'string',
+      },
+      dateOfBirth: {
+        type: 'string',
+      },
+      stateOfOrigin: {
+        type: 'string',
+      },
+      gender: {
+        type: 'string',
+      },
+      nationality: {
+        type: 'string',
+      },
+      occupation: {
+        type: 'string',
+      },
+      residentialAddress: {
+        type: 'string',
+      },
+      cityOfResidence: {
+        type: 'string',
+      },
+      countryOfResidence: {
+        type: 'string',
+      },
+      identificationDoc: {
+        type: 'string',
+      },
+      identificationDocNumber: {
         type: 'string',
       },
     };

@@ -152,5 +152,3 @@
                 type: array
                 items:
                   $ref: "#/definitions/WalletHistory"
-
-

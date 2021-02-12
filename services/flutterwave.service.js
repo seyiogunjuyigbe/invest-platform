@@ -137,19 +137,24 @@ module.exports = class Flutterwave {
   }
 
   async verifyAccount(options) {
-    const url = this.endpoints.verifyAccount;
+    const url = this.endpoints.raveVerifyAccount;
     const params = {
-      recipientaccount: options.bankAccount,
-      destbankcode: options.bankCode,
-      PBFPubKey: this.config.publicKey,
+      account_number: options.bankAccount,
+      account_bank: options.bankCode,
     };
-    const response = await http.post(url, params);
+    const response = await http.post(url, params, {
+      Authorization: `Bearer ${this.config.secretKey}`,
+    });
 
     if (response && response.data) {
       const { status } = response.data;
       const responseCode = response.data.data.responsecode;
 
-      return status === 'success' && responseCode === '00';
+      if (status === 'success' && responseCode === '00') {
+        // account name needed from response
+        return response.data.data;
+      }
+      return false;
     }
 
     return false;
@@ -224,6 +229,22 @@ module.exports = class Flutterwave {
       } else {
         throw error;
       }
+    }
+  }
+
+  async verifyBvn(bvn) {
+    try {
+      const url = `${this.endpoints.raveValidateBvn}/${bvn}`;
+      const headers = {
+        Authorization: `Bearer ${this.config.secretKey}`,
+      };
+      const response = await http.get(url, headers);
+      if (response && response.data) {
+        return response.data.status === 'success' ? response.data : false;
+      }
+      return false;
+    } catch (error) {
+      return false;
     }
   }
 

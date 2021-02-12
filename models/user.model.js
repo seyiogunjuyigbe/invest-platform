@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const Wallet = require('./wallet.model');
 
@@ -50,6 +51,31 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isKYCVerified: {
+      type: Boolean,
+      default: false,
+    },
+    dateOfBirth: Date,
+    stateOfOrigin: String,
+    gender: String,
+    nationality: String,
+    occupation: String,
+    residentialAddress: String,
+    cityOfResidence: String,
+    countryOfResidence: String,
+    identificationDoc: String,
+    identificationDocNumber: String,
+    bvnFirstName: String,
+    bvnMiddleName: String,
+    bvnLastName: String,
+    bvnDateOfBirth: String,
+    bvnPhoneNumber: String,
+    bankAccounts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'BankAccount',
+      },
+    ],
   },
   {
     timestamps: true,
@@ -63,6 +89,7 @@ userSchema.options.toJSON = {
   virtuals: true,
   transform(doc, ret) {
     delete ret.password;
+    ret.bvn = jwt.decode(ret.bvn);
     return ret;
   },
 };
@@ -77,6 +104,12 @@ userSchema.pre('save', function saveHook(next) {
   const salt = bcrypt.genSaltSync(saltRounds);
   const hash = bcrypt.hashSync(this.password, salt);
   this.password = hash;
+  return next();
+});
+
+userSchema.pre('save', function saveBvn(next) {
+  if (!this.isModified('bvn')) return next();
+  this.bvn = jwt.sign(this.bvn, process.env.JWT_SECRET);
   return next();
 });
 
