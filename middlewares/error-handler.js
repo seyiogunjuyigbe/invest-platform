@@ -1,4 +1,5 @@
-const { omit } = require('lodash');
+const { omit, startCase } = require('lodash');
+const pluralize = require('pluralize');
 
 // eslint-disable-next-line
 module.exports = function errorHandler(err, req, res, next) {
@@ -18,6 +19,23 @@ module.exports = function errorHandler(err, req, res, next) {
     return res.status(400).send({
       message: 'invalid parameter sent',
       reason: !isProd ? err.message : null,
+    });
+  }
+
+  if (err.code === 11000) {
+    const vars = err.message.split(':');
+    const tableName = vars[1].split(' ')[1].split('.')[1];
+    const modelName = startCase(pluralize.singular(tableName));
+    const fieldName = vars[2].split(' ')[1].split('_')[0];
+    console.log({
+      err,
+      vars,
+      tableName,
+      modelName,
+      fieldName,
+    });
+    return res.status(400).json({
+      message: `${modelName} with the ${fieldName} exists`,
     });
   }
 
