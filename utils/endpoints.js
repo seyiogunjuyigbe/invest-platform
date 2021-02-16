@@ -1,7 +1,6 @@
 module.exports = function endpointsUtil() {
   const flwBaseUrl =
     process.env.FLUTTERWAVE_BASE_URL || 'https://api.flutterwave.com/v3';
-
   return {
     raveAuthUrl: `${flwBaseUrl}/payments`,
     raveInitiatePayment: `${flwBaseUrl}/flwv3-pug/getpaidx/api/charge`,
@@ -14,5 +13,7 @@ module.exports = function endpointsUtil() {
     raveBeneficiaryUrl: `${flwBaseUrl}/beneficiaries`,
     raveTransferUrl: `${flwBaseUrl}/transfers`,
     raveGetTx: `${flwBaseUrl}/transactions`,
+    raveValidateBvn: `${flwBaseUrl}/kyc/bvns`,
+    raveVerifyAccount: `${flwBaseUrl}/accounts/resolve`,
   };
 };

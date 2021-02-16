@@ -14,6 +14,13 @@ router.get(
   isAuthenticated,
   UsersController.getWalletHistories
 );
+router.post('/bvn', isAuthenticated, UsersController.verifyBvn);
+router.get(
+  '/verify-bvn',
+  isAuthenticated,
+  adminRoute(),
+  UsersController.verifyUserBvnAsAdmin
+);
 router.get('/:userId', isAuthenticated, UsersController.fetchUser);
 router.put('/:userId', isAuthenticated, UsersController.updateUser);
 router.delete(

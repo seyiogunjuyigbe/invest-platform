@@ -1,0 +1,19 @@
+#Document
+  Document:
+    type: object
+    properties:
+      category:
+        type: string
+      documentNumber:
+        type: string
+      user:
+        type: object
+      document:
+        type: string
+      status: 
+        type: string
+        enum: ['pending', 'verified', 'declined']
+      actionBy:
+        type: object
+      remarks:
+        type: string
