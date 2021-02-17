@@ -8,7 +8,7 @@ const { find, findOne } = require('../utils/query');
 class InvestmentsController {
   static async createInvestment(req, res, next) {
     try {
-      InvestmentsController.validateRequest(req.body, false);
+      InvestmentsController.validateRequest(req, false);
 
       const investment = await Investment.create(req.body);
 
@@ -31,7 +31,7 @@ class InvestmentsController {
         throw createError(400, 'invalid user info');
       }
 
-      InvestmentsController.validateRequest(req.body, false);
+      InvestmentsController.validateRequest(req, false);
 
       const wallet = await user.getWallet();
       const investment = await Investment.create({
@@ -60,9 +60,7 @@ class InvestmentsController {
         throw createError(400, 'invalid user info');
       }
 
-      if (!req.body.amount) {
-        throw createError(400, 'please provide fund amount');
-      }
+      InvestmentsController.validateRequest(req, false, 'fund');
 
       const wallet = await user.getWallet();
       const investment = await Investment.findById(req.params.investmentId);
@@ -98,9 +96,7 @@ class InvestmentsController {
         throw createError(400, 'invalid user info');
       }
 
-      if (!req.body.amount) {
-        throw createError(400, 'please provide return amount');
-      }
+      InvestmentsController.validateRequest(req, false, 'credit-return');
 
       const investment = await Investment.findById(req.params.investmentId);
 
@@ -182,7 +178,7 @@ class InvestmentsController {
 
   static async updateInvestment(req, res, next) {
     try {
-      InvestmentsController.validateRequest(req.body, true);
+      InvestmentsController.validateRequest(req, true);
 
       const investment = await findOne(Investment, req);
 
@@ -218,22 +214,50 @@ class InvestmentsController {
     }
   }
 
-  static validateRequest(body, isUpdate) {
-    const fields = {
-      name: {
-        type: 'string',
-        required: false,
-      },
-      capital: {
-        type: ['integer', 'number'],
-        required: !isUpdate,
-      },
-      portfolio: {
-        type: 'string',
-        format: 'mongo-id',
-        required: !isUpdate,
-      },
-    };
+  static validateRequest(req, isUpdate, type = 'create') {
+    const { body, user } = req;
+    let fields;
+
+    switch (type) {
+      case 'create':
+        fields = {
+          name: {
+            type: 'string',
+            required: false,
+          },
+          capital: {
+            type: ['integer', 'number'],
+            required: !isUpdate,
+          },
+          portfolio: {
+            type: 'string',
+            format: 'mongo-id',
+            required: !isUpdate,
+          },
+        };
+        break;
+
+      case 'fund':
+      case 'credit-return':
+        fields = {
+          amount: {
+            type: ['integer', 'number'],
+            required: true,
+          },
+          ...(['superadmin', 'admin'].includes(user.type)
+            ? {
+                userId: {
+                  type: 'integer',
+                  required: true,
+                },
+              }
+            : {}),
+        };
+        break;
+
+      default:
+        break;
+    }
 
     validate(body, { properties: fields }, isUpdate);
   }
