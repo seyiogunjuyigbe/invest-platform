@@ -6,11 +6,6 @@ const Investment = require('../models/investment.model');
 const { asyncSeries } = require('../utils/app');
 
 async function processMaturedInvestment(investment) {
-  const { portfolio } = investment;
-  if (!portfolio) {
-    return;
-  }
-
   console.log(`***** Processing investment with ID(${investment.id})`);
 
   return investment.payout();
@@ -23,7 +18,7 @@ async function processMaturedInvestments() {
       $lte: m.utc().toDate(),
     },
     isClosed: false,
-  }).populate('portfolio');
+  });
 
   console.log(
     `***** Found ${allMaturedInvestments.length} matured investments *****`
