@@ -10,7 +10,7 @@ const { find, findOne } = require('../utils/query');
 const flutterwaveService = require('../services/flutterwave.service');
 
 const flutterwave = flutterwaveService.getInstance();
-const { response } = require('../middlewares/api_response');
+const { response } = require('../middlewares/api-response');
 
 class UsersController {
   static async createUser(req, res, next) {
