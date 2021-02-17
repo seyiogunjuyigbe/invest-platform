@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const createError = require('http-errors');
 
-const { currCalc } = require('../utils/app');
+const { currCalc, createReference } = require('../utils/app');
 const WalletHistory = require('./wallet.history.model');
+const Transaction = require('./transaction.model');
 
 const { Schema } = mongoose;
 
@@ -25,6 +26,39 @@ const walletSchema = new Schema(
     timestamps: true,
   }
 );
+
+walletSchema.methods.canWithdraw = async function canWithdraw(amount) {
+  return this.balance >= amount;
+};
+
+walletSchema.methods.fundInvestment = async function fundInvestment(
+  investment,
+  amount
+) {
+  const hasEnoughBalance = this.canWithdraw(amount);
+  if (!hasEnoughBalance) {
+    throw createError(422, 'insufficient wallet balance');
+  }
+
+  const transaction = await Transaction.create({
+    amount,
+    type: 'fund',
+    status: 'successful',
+    reference: createReference('fund'),
+    processor: 'wallet',
+    paymentType: 'wallet',
+    user: investment.user,
+    description: `fund for investment(${investment.id})`,
+    sourceType: 'Wallet',
+    sourceId: this.id,
+    destinationType: 'Investment',
+    destinationId: investment.id,
+  });
+
+  await this.debit(transaction);
+
+  return investment.credit(amount);
+};
 
 walletSchema.methods.credit = async function credit(transaction) {
   const newBalance = currCalc(this.balance, '+', transaction.amount);
@@ -50,7 +84,7 @@ walletSchema.methods.debit = async function debit(transaction) {
   const newBalance = currCalc(this.balance, '-', transaction.amount);
 
   if (newBalance < 0) {
-    throw createError('Insufficient balance');
+    throw createError(422, 'insufficient wallet balance');
   }
 
   await this.updateOne({

@@ -30,6 +30,9 @@ exports.createReference = function createReference(type) {
     case 'fund':
       prefix = 'BGIP_FND';
       break;
+    case 'payout':
+      prefix = 'BGIP_PYT';
+      break;
     default:
       break;
   }
@@ -52,4 +55,12 @@ exports.currCalc = function currCalc(val1, op, val2, toString = false) {
   }
 
   return result.value();
+};
+
+exports.asyncSeries = async function asyncSeries(array, callback, useIndex) {
+  return array.reduce(async (previousPromise, nextItem, index) => {
+    await previousPromise;
+
+    return useIndex ? callback(nextItem, index) : callback(nextItem);
+  }, Promise.resolve());
 };

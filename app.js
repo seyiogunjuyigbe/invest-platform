@@ -66,5 +66,6 @@ app.use((req, res) => res.status(404).json({ message: 'URL Not Found' }));
 
 require('./config/passport');
 require('./bootstrap')();
+require('./jobs')();
 
 module.exports = app;
