@@ -121,6 +121,7 @@ class PortfolioController {
       category: {
         type: 'string',
         required: true,
+        enum: ['forex', 'real-estate', 'mutual-funds'],
       },
       description: {
         type: 'string',
@@ -128,12 +129,21 @@ class PortfolioController {
       },
       roi: {
         type: 'number',
-        required: false,
+        required: true,
+      },
+      duration: {
+        type: 'number',
+        required: true,
       },
       risk: {
         type: 'string',
-        required: false,
+        required: true,
         enum: ['low', 'medium', 'high'],
+      },
+      disbursementType: {
+        type: 'string',
+        required: true,
+        enum: ['monthly', 'maturity'],
       },
       startDate: {
         type: 'string',

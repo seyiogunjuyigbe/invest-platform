@@ -18,9 +18,14 @@
         type: number
       risk:
         type: string
+      disbursementType:
+        type: string
+        enum: ['monthly', 'maturity']
       image:
         type: string
       memorandum:
         type: string
       roi:
+        type: number
+      duration:
         type: number

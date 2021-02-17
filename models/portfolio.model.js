@@ -8,10 +8,16 @@ const portfolioSchema = new Schema(
       type: String,
       enum: ['forex', 'real-estate', 'mutual-funds'],
     },
+    disbursementType: {
+      type: String,
+      enum: ['monthly', 'maturity'],
+    },
     description: String,
-    roi: Number,
+    roi: { type: Number, required: true },
+    duration: { type: Number, required: true },
     risk: {
       type: String,
+      required: true,
       enum: ['low', 'medium', 'high'],
     },
     startDate: Date,
