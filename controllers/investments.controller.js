@@ -1,6 +1,7 @@
 const createError = require('http-errors');
 const { validate } = require('../utils/validator');
 const Investment = require('../models/investment.model');
+const InvestmentReturn = require('../models/investment.return.model');
 const User = require('../models/user.model');
 const { find, findOne } = require('../utils/query');
 
@@ -33,7 +34,10 @@ class InvestmentsController {
       InvestmentsController.validateRequest(req.body, false);
 
       const wallet = await user.getWallet();
-      const investment = await Investment.create(req.body);
+      const investment = await Investment.create({
+        ...req.body,
+        user: user.id,
+      });
 
       await wallet.fundInvestment(investment, investment.capital);
 
@@ -71,7 +75,7 @@ class InvestmentsController {
         throw createError(422, 'you cannot fund a closed investment');
       }
 
-      if (user.id !== investment.user) {
+      if (user.id !== investment.user.toString()) {
         throw createError(403, 'you are not allowed to perform this action');
       }
 
@@ -80,6 +84,49 @@ class InvestmentsController {
       return res.status(200).json({
         message: 'investment funded successfully',
         data: investment,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async creditInvestmentReturn(req, res, next) {
+    try {
+      const user = await User.findById(req.body.userId);
+
+      if (!user) {
+        throw createError(400, 'invalid user info');
+      }
+
+      if (!req.body.amount) {
+        throw createError(400, 'please provide return amount');
+      }
+
+      const investment = await Investment.findById(req.params.investmentId);
+
+      if (!investment) {
+        throw createError(404, 'investment not found');
+      }
+
+      if (investment.isClosed) {
+        throw createError(
+          422,
+          'you cannot credit returns to a closed investment'
+        );
+      }
+
+      if (user.id !== investment.user.toString()) {
+        throw createError(403, 'you are not allowed to perform this action');
+      }
+
+      const newReturn = await investment.creditReturn(
+        req.body.amount,
+        req.user.id
+      );
+
+      return res.status(200).json({
+        message: 'investment return credited successfully',
+        data: newReturn,
       });
     } catch (error) {
       next(error);
@@ -110,6 +157,23 @@ class InvestmentsController {
       return res.status(200).json({
         message: 'investments retrieved successfully',
         data: investments,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async listInvestmentReturns(req, res, next) {
+    try {
+      const conditions = ['superadmin', 'admin'].includes(req.user.type)
+        ? {}
+        : { user: req.user.id };
+
+      const returns = await find(InvestmentReturn, req, conditions);
+
+      return res.status(200).json({
+        message: 'investment returns retrieved successfully',
+        data: returns,
       });
     } catch (error) {
       next(error);
@@ -162,10 +226,6 @@ class InvestmentsController {
       },
       capital: {
         type: ['integer', 'number'],
-        required: !isUpdate,
-      },
-      duration: {
-        type: 'integer',
         required: !isUpdate,
       },
       portfolio: {

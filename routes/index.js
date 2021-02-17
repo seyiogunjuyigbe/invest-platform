@@ -9,6 +9,7 @@ const PortfolioRoutes = require('./portfolios.route');
 const TransactionRoutes = require('./transactions.route');
 const DocumentRoutes = require('./document.route');
 const BankRoutes = require('./bank.route');
+const InvestmentRoutes = require('./investments.route');
 
 router.use('/users', UserRoutes);
 router.use('/auth', AuthRoutes);
@@ -17,4 +18,5 @@ router.use('/portfolios', PortfolioRoutes);
 router.use('/transactions', TransactionRoutes);
 router.use('/documents', DocumentRoutes);
 router.use('/bank-accounts', BankRoutes);
+router.use('/investments', InvestmentRoutes);
 module.exports = router;

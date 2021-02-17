@@ -27,3 +27,5 @@
         type: string
       roi:
         type: number
+      duration:
+        type: number
