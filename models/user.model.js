@@ -6,7 +6,7 @@ const Wallet = require('./wallet.model');
 
 const { Schema } = mongoose;
 
-const userSchema = new Schema(
+const UserSchema = new Schema(
   {
     firstName: {
       type: String,
@@ -80,6 +80,7 @@ const userSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: 'Portfolio',
+        default: [],
       },
     ],
   },
@@ -88,10 +89,10 @@ const userSchema = new Schema(
   }
 );
 
-userSchema.statics.comparePassword = async (password, userPassword) =>
+UserSchema.statics.comparePassword = async (password, userPassword) =>
   bcrypt.compare(password, userPassword);
 
-userSchema.options.toJSON = {
+UserSchema.options.toJSON = {
   virtuals: true,
   transform(doc, ret) {
     delete ret.password;
@@ -100,11 +101,11 @@ userSchema.options.toJSON = {
   },
 };
 
-userSchema.virtual('name').get(function name() {
+UserSchema.virtual('name').get(function name() {
   return `${this.firstName} ${this.lastName}`;
 });
 
-userSchema.pre('save', function saveHook(next) {
+UserSchema.pre('save', function saveHook(next) {
   if (!this.isModified('password')) return next();
   const saltRounds = 10;
   const salt = bcrypt.genSaltSync(saltRounds);
@@ -113,17 +114,17 @@ userSchema.pre('save', function saveHook(next) {
   return next();
 });
 
-userSchema.pre('save', function saveBvn(next) {
+UserSchema.pre('save', function saveBvn(next) {
   if (!this.isModified('bvn')) return next();
   this.bvn = jwt.sign(this.bvn, process.env.JWT_SECRET);
   return next();
 });
 
-userSchema.methods.validPassword = async function validPassword(password) {
+UserSchema.methods.validPassword = async function validPassword(password) {
   return bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.getWallet = async function getWallet() {
+UserSchema.methods.getWallet = async function getWallet() {
   const wallet = await Wallet.findOne({
     user: this.id,
   });
@@ -131,6 +132,6 @@ userSchema.methods.getWallet = async function getWallet() {
   return wallet || Wallet.create({ user: this.id });
 };
 
-const userModel = mongoose.model('User', userSchema);
+const User = mongoose.model('User', UserSchema);
 
-module.exports = userModel;
+module.exports = User;

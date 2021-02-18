@@ -53,7 +53,6 @@ const TransactionSchema = new Schema(
     portfolio: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Portfolio',
-      required: true,
     },
     sourceType: String,
     sourceId: String,

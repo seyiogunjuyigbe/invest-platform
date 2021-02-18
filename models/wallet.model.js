@@ -4,7 +4,6 @@ const createError = require('http-errors');
 const { currCalc, createReference } = require('../utils/app');
 const WalletHistory = require('./wallet.history.model');
 const Transaction = require('./transaction.model');
-const User = require('./user.model');
 
 const { Schema } = mongoose;
 
@@ -59,8 +58,11 @@ walletSchema.methods.fundInvestment = async function fundInvestment(
 
   await this.debit(transaction);
 
+  // eslint-disable-next-line
+  const User = require('./user.model');
+
   const user =
-    investment.user && investment.user.id
+    investment.user && investment.user.name
       ? investment.user
       : await User.findById(investment.user);
 
