@@ -134,7 +134,7 @@ investmentSchema.methods.payout = async function payout() {
 
 investmentSchema.methods.getCurrentReturnsDue = async function getCurrentReturnsDue() {
   const portfolio =
-    this.portfolio && this.portfolio.id
+    this.portfolio && this.portfolio.title
       ? this.portfolio
       : await Portfolio.findById(this.portfolio);
 

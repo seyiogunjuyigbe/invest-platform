@@ -89,7 +89,7 @@ TransactionSchema.methods.processPayment = async function processPayment() {
 
       if (isSuccessful) {
         const user =
-          this.user && this.user.id
+          this.user && this.user.name
             ? this.user
             : await User.findById(this.user);
         const wallet = await user.getWallet();
