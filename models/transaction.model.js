@@ -50,6 +50,11 @@ const TransactionSchema = new Schema(
     description: {
       type: String,
     },
+    portfolio: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Portfolio',
+      required: true,
+    },
     sourceType: String,
     sourceId: String,
     destinationType: String,
