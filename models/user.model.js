@@ -76,6 +76,12 @@ const userSchema = new Schema(
         ref: 'BankAccount',
       },
     ],
+    portfolios: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Portfolio',
+      },
+    ],
   },
   {
     timestamps: true,
