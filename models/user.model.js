@@ -45,6 +45,11 @@ const UserSchema = new Schema(
       default: 'none',
       enum: ['finance', 'non-finance', 'none'],
     },
+    status: {
+      type: String,
+      default: 'active',
+      enum: ['active', 'inactive', 'disabled'],
+    },
     notificationToken: String,
     bvn: String,
     isBVNVerified: {
