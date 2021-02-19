@@ -8,8 +8,8 @@ const isAuthenticated = require('../middlewares/is-authenticated');
 
 router.post(
   '/',
-  adminRoute(),
   isAuthenticated,
+  adminRoute(),
   InvestmentsController.createInvestment
 );
 router.post(
