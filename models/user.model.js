@@ -137,6 +137,20 @@ UserSchema.methods.getWallet = async function getWallet() {
   return wallet || Wallet.create({ user: this.id });
 };
 
+UserSchema.methods.getTotalInvested = async function getTotalInvested(
+  portfolio
+) {
+  // eslint-disable-next-line
+  const Investment = require('./investment.model');
+  const conditions = { user: this.id };
+  if (portfolio) {
+    conditions.portfolio = portfolio;
+  }
+
+  const allInvestments = await Investment.find(conditions);
+  return allInvestments.reduce((p, n) => p + n.currentBalance, 0);
+};
+
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User;
