@@ -84,7 +84,7 @@ class UsersController {
 
       users.data = await Promise.all(
         users.data.map(async user => ({
-          ...user,
+          ...user.toJSON(),
           totalInvested: await user.getTotalInvested(),
         }))
       );
