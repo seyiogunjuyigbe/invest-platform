@@ -43,7 +43,7 @@ class UsersController {
       return res.status(200).json({
         message: 'user retrieved successfully',
         data: {
-          ...user,
+          ...user.toJSON(),
           totalInvested: await user.getTotalInvested(),
         },
       });
