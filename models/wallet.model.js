@@ -53,9 +53,22 @@ walletSchema.methods.fundInvestment = async function fundInvestment(
     sourceId: this.id,
     destinationType: 'Investment',
     destinationId: investment.id,
+    portfolio: investment.portfolio,
   });
 
   await this.debit(transaction);
+
+  // eslint-disable-next-line
+  const User = require('./user.model');
+
+  const user =
+    investment.user && investment.user.name
+      ? investment.user
+      : await User.findById(investment.user);
+
+  user.portfolios.addToSet(investment.portfolio);
+
+  await user.save();
 
   return investment.credit(amount);
 };

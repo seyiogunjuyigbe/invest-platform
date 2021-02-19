@@ -50,6 +50,10 @@ const TransactionSchema = new Schema(
     description: {
       type: String,
     },
+    portfolio: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Portfolio',
+    },
     sourceType: String,
     sourceId: String,
     destinationType: String,
@@ -85,7 +89,7 @@ TransactionSchema.methods.processPayment = async function processPayment() {
 
       if (isSuccessful) {
         const user =
-          this.user && this.user.id
+          this.user && this.user.name
             ? this.user
             : await User.findById(this.user);
         const wallet = await user.getWallet();

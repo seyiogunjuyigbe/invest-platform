@@ -15,11 +15,7 @@ const { response } = require('../middlewares/api-response');
 class UsersController {
   static async createUser(req, res, next) {
     try {
-      UsersController.validateRequest(
-        req.body,
-        false,
-        req.path.includes('signup')
-      );
+      UsersController.validateRequest(req, false, req.path.includes('signup'));
       const user = await User.create(req.body);
       const expiry = moment.utc().add(1, 'hours');
       const otp = await Otp.create({
@@ -94,7 +90,7 @@ class UsersController {
 
   static async updateUser(req, res, next) {
     try {
-      UsersController.validateRequest(req.body, true);
+      UsersController.validateRequest(req, true);
 
       const user = await findOne(User, req);
 
@@ -131,7 +127,7 @@ class UsersController {
   }
 
   static async verifyBvn(req, res, next) {
-    UsersController.validateRequest(req.body, false, false, true);
+    UsersController.validateRequest(req, false, false, true);
     try {
       const { bvn } = req.body;
       const duplicateUser = await User.findOne({ bvn });
@@ -214,7 +210,13 @@ class UsersController {
     }
   }
 
-  static validateRequest(body, isUpdate, isUserSignup, isBvnUpdate = false) {
+  static validateRequest(
+    body,
+    isUpdate,
+    isUserSignup,
+    isBvnUpdate = false,
+    user
+  ) {
     const fields = {
       type: {
         type: 'string',
@@ -282,6 +284,14 @@ class UsersController {
       identificationDocNumber: {
         type: 'string',
       },
+      ...(['superadmin', 'admin'].includes(user.type)
+        ? {
+            status: {
+              type: 'string',
+              enum: ['active', 'inactive', 'disabled'],
+            },
+          }
+        : {}),
     };
 
     validate(body, { properties: fields }, isUpdate);
