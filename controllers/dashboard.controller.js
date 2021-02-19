@@ -16,8 +16,6 @@ class DashboardController {
 
       const portfoliosByCategories = groupBy(totalPortfolios, 'category');
 
-      console.log(portfoliosByCategories.forex.map(p => p.id));
-
       const investorCountByCategories = await Promise.all(
         Object.keys(portfoliosByCategories).map(async category => ({
           category: `${startCase(category)} Investors`,
