@@ -6,7 +6,7 @@ const { validate } = require('../utils/validator');
 class PortfolioController {
   static async createPortfolio(req, res, next) {
     try {
-      PortfolioController.validateRequest(req.body);
+      PortfolioController.validateRequest({ ...req.body });
       const { startDate, endDate } = req.body;
       let image;
       let memorandum;
