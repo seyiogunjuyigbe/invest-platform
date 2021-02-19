@@ -196,7 +196,7 @@ class UsersController {
       await req.user.save();
       response(res, 200, 'bvn verified successfully');
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -214,58 +214,40 @@ class UsersController {
     }
   }
 
-  static validateRequest(
-    body,
-    isUpdate,
-    isUserSignup,
-    isBvnUpdate = false,
-    isBankUpdate = false
-  ) {
+  static validateRequest(body, isUpdate, isUserSignup, isBvnUpdate = false) {
     const fields = {
       type: {
         type: 'string',
-        required: !isUpdate && !isUserSignup && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isUserSignup && !isBvnUpdate,
         enum: ['investor', 'admin', 'superadmin'],
       },
       role: {
         type: 'string',
-        required: !isUpdate && !isUserSignup && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isUserSignup && !isBvnUpdate,
         enum: ['finance', 'non-finance', 'none'],
       },
       firstName: {
         type: 'string',
-        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isBvnUpdate,
       },
       lastName: {
         type: 'string',
-        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isBvnUpdate,
       },
       email: {
         type: 'string',
-        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isBvnUpdate,
       },
       phone: {
         type: 'string',
       },
       password: {
         type: 'string',
-        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isBvnUpdate,
       },
       bvn: {
         type: 'string',
         required: isBvnUpdate,
-      },
-      bankAccount: {
-        type: 'string',
-        required: isBankUpdate,
-      },
-      bankCode: {
-        type: 'string',
-        required: isBankUpdate,
-      },
-      bankName: {
-        type: 'string',
-        required: isBankUpdate,
       },
       isEmailVerifed: {
         type: 'string',

@@ -36,14 +36,14 @@ class BankController {
 
   static async addBankAccount(req, res, next) {
     try {
-      BankController.validateRequest(req.body, false, false, false, true);
+      BankController.validateRequest(req.body);
       const { bankCode, bankName } = req.body;
       const verifyAcct = await flutterwave.verifyAccount(req.body);
       if (!verifyAcct) {
         return response(
           res,
           400,
-          'your bank details coud not be verified. please doube check and try again'
+          'your bank details coud not be verified. please double check and try again'
         );
         // bank account not resolved
       }
