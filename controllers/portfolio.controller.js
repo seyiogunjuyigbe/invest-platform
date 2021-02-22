@@ -6,7 +6,7 @@ const { validate } = require('../utils/validator');
 class PortfolioController {
   static async createPortfolio(req, res, next) {
     try {
-      PortfolioController.validateRequest(req.body);
+      PortfolioController.validateRequest({ ...req.body });
       const { startDate, endDate } = req.body;
       let image;
       let memorandum;
@@ -92,6 +92,10 @@ class PortfolioController {
   static async fetchPortfolios(req, res, next) {
     try {
       const portfolios = await find(Portfolio, req);
+      portfolios.data.map(async portfolio => ({
+        ...portfolio.toJSON(),
+        investorCount: await portfolio.getInvestorCount(),
+      }));
       return res.status(200).json({
         message: 'portfolios retrieved successfully',
         data: portfolios,
@@ -104,9 +108,13 @@ class PortfolioController {
   static async fetchSinglePortfolio(req, res, next) {
     try {
       const portfolio = await findOne(Portfolio, req);
-      return res
-        .status(200)
-        .json({ message: 'portfolio retrieved successfully', data: portfolio });
+      return res.status(200).json({
+        message: 'portfolio retrieved successfully',
+        data: {
+          ...portfolio.toJSON(),
+          investorCount: await portfolio.getInvestorCount(),
+        },
+      });
     } catch (err) {
       next(err);
     }

@@ -42,7 +42,10 @@ class UsersController {
 
       return res.status(200).json({
         message: 'user retrieved successfully',
-        data: user,
+        data: {
+          ...user.toJSON(),
+          totalInvested: await user.getTotalInvested(),
+        },
       });
     } catch (error) {
       next(error);
@@ -78,6 +81,13 @@ class UsersController {
   static async listUsers(req, res, next) {
     try {
       const users = await find(User, req);
+
+      users.data = await Promise.all(
+        users.data.map(async user => ({
+          ...user.toJSON(),
+          totalInvested: await user.getTotalInvested(),
+        }))
+      );
 
       return res.status(200).json({
         message: 'users retrieved successfully',

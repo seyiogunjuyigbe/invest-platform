@@ -225,7 +225,10 @@ class AuthController {
 
   static async fetchProfile(req, res, next) {
     try {
-      return res.status(200).json(req.user);
+      return res.status(200).json({
+        ...req.user.toJSON(),
+        totalInvested: await req.user.getTotalInvested(),
+      });
     } catch (err) {
       next(err);
     }
