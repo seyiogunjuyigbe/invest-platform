@@ -36,7 +36,7 @@ class BankController {
 
   static async addBankAccount(req, res, next) {
     try {
-      BankController.validateRequest(req.body);
+      BankController.validateRequest(req.body, false);
       const { bankCode, bankName } = req.body;
       const verifyAcct = await flutterwave.verifyAccount(req.body);
       if (!verifyAcct) {
@@ -107,19 +107,45 @@ class BankController {
     }
   }
 
-  static validateRequest(body) {
+  static async verifyBankAccount(req, res, next) {
+    try {
+      BankController.validateRequest(req.body, true);
+      const bankAccount = await BankAccount.findById(req.params.bankAccountId);
+      if (!bankAccount) {
+        return response(res, 404, 'invalid bank account');
+      }
+      bankAccount.isVerified = req.body.status === 'approved';
+      bankAccount.verifiedBy = req.user.id;
+      await bankAccount.save();
+      return response(
+        res,
+        200,
+        'bank account updated successfully',
+        bankAccount
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static validateRequest(body, verify = false) {
     const fields = {
       bankAccount: {
         type: 'string',
-        required: true,
+        required: !verify,
       },
       bankCode: {
         type: 'string',
-        required: true,
+        required: !verify,
       },
       bankName: {
         type: 'string',
-        required: true,
+        required: !verify,
+      },
+      status: {
+        type: 'string',
+        enum: ['approved', 'declined'],
+        required: verify,
       },
     };
 

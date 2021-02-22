@@ -5,7 +5,9 @@ const { validate } = require('../utils/validator');
 const flutterwaveService = require('../services/flutterwave.service');
 const { createReference } = require('../utils/app');
 const { find, findOne } = require('../utils/query');
+const { sendMail } = require('../services/mail.service');
 
+const { ADMIN_MAIL } = process.env;
 const flutterwave = flutterwaveService.getInstance();
 class WithdrawController {
   static async initiateWithdrawal(req, res, next) {
@@ -18,6 +20,13 @@ class WithdrawController {
       });
       if (!userBank) {
         return response(res, 422, 'invalid bank details');
+      }
+      if (!userBank.isVerified) {
+        return response(
+          res,
+          401,
+          'sorry, you can only withdraw to a verified bank account'
+        );
       }
       const wallet = await req.user.getWallet();
       if (!wallet.canWithdraw(Number(amount))) {
@@ -36,6 +45,17 @@ class WithdrawController {
         destinationId: userBank._id,
       });
       await wallet.debit(withdrawalTransaction);
+
+      // check balance
+      const flwBalance = await flutterwave.getBalance();
+      if (!flwBalance || flwBalance.available_balance < Number(amount)) {
+        await sendMail(
+          'Insufficient Flutterwave Balance',
+          ADMIN_MAIL,
+          `Your flutterwave wallet balance is low and users can therefore not make withdrawals. Please fund urgently`
+        );
+        return response(res, 200, 'withdrawal pending', withdrawalTransaction);
+      }
       const options = {
         amountNgn: amount,
         reference: withdrawalTransaction.reference,
@@ -100,7 +120,7 @@ class WithdrawController {
     }
   }
 
-  static async fetchWithdrawalequests(req, res, next) {
+  static async fetchWithdrawalRequests(req, res, next) {
     try {
       if (
         ['superadmin', 'admin'].includes(req.user.type) &&
@@ -125,7 +145,7 @@ class WithdrawController {
     }
   }
 
-  static async fetchWithdrawalequest(req, res, next) {
+  static async fetchWithdrawalRequest(req, res, next) {
     try {
       if (
         ['superadmin', 'admin'].includes(req.user.type) &&
@@ -145,6 +165,53 @@ class WithdrawController {
         'withdrawal request fetched successfully',
         withdrawalRequest
       );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async processWithdrawal(req, res, next) {
+    try {
+      const withdrawal = await Transaction.findById(
+        req.params.transactionId
+      ).populate('bankAccount');
+      if (!withdrawal) {
+        return response(res, 404, 'withdrawal request not found');
+      }
+      const { amount, bankAccount, reference, _id, currency } = withdrawal;
+      const flwBalance = await flutterwave.getBalance();
+      if (!flwBalance || flwBalance.available_balance < amount) {
+        await sendMail(
+          'Insufficient Flutterwave Balance',
+          ADMIN_MAIL,
+          `Your flutterwave wallet balance is low and users can therefore not make withdrawals. Please fund urgently`
+        );
+        return response(
+          res,
+          200,
+          'withdrawal processing failed due to insufficient balance',
+          withdrawal
+        );
+      }
+      const options = {
+        amountNgn: amount,
+        reference,
+        bankAccount,
+        currency,
+        callback_url: `${req.headers.host}/flw-callback/${_id}`,
+        meta: {
+          transaction: _id,
+        },
+      };
+      const withdrawalRequest = await flutterwave.withdraw(options);
+      if (withdrawalRequest.status === 'success') {
+        return response(
+          res,
+          200,
+          'withdrawal initiated successfully',
+          withdrawalRequest
+        );
+      }
     } catch (error) {
       next(error);
     }

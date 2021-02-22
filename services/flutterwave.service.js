@@ -246,17 +246,30 @@ module.exports = class Flutterwave {
   }
 
   async verifyBvn(bvn) {
+    const url = `${this.endpoints.raveValidateBvn}/${bvn}`;
+    const headers = {
+      Authorization: `Bearer ${this.config.secretKey}`,
+    };
+    const response = await http.get(url, headers);
+    if (response && response.data) {
+      return response.status === 'success' ? response.data : false;
+    }
+    return false;
+  }
+
+  async getBalance(currency = 'NGN') {
     try {
-      const url = `${this.endpoints.raveValidateBvn}/${bvn}`;
+      const url = `${this.endpoints.raveGetBalance}/${currency}`;
       const headers = {
         Authorization: `Bearer ${this.config.secretKey}`,
       };
       const response = await http.get(url, headers);
       if (response && response.data) {
-        return response.data.status === 'success' ? response.data : false;
+        return response.status === 'success' ? response.data : false;
       }
       return false;
     } catch (error) {
+      console.log({ error });
       return false;
     }
   }

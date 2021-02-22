@@ -15,5 +15,6 @@ module.exports = function endpointsUtil() {
     raveGetTx: `${flwBaseUrl}/transactions`,
     raveValidateBvn: `${flwBaseUrl}/kyc/bvns`,
     raveVerifyAccount: `${flwBaseUrl}/accounts/resolve`,
+    raveGetBalance: `${flwBaseUrl}/balances`,
   };
 };

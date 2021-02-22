@@ -15,6 +15,14 @@ const bankAccountSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verifiedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   { timestamps: true }
 );

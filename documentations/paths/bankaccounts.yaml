@@ -139,4 +139,34 @@
               data:
                 type: object
                 schema:
-                  $ref: "#/definitions/BankAccount"  
+                  $ref: "#/definitions/BankAccount" 
+  /bank-accounts/:bankAccountId/verify:          
+    post:
+      summary: verify bank account(admin)
+      operationId: verifyBankAccount
+      tags:
+      - Bank Accounts
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true 
+        - in: body
+          name: payload
+          type: object
+          properties:
+            status:
+              type: string
+              required: true  
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                schema:
+                  $ref: "#/definitions/BankAccount"                    

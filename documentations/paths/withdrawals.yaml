@@ -96,3 +96,28 @@
                 type: object
                 schema:
                   $ref: "#/definitions/Transaction"
+  /withdrawals/{transactionId}/process:
+    get:
+      summary: process withdrawal request as admin
+      description: process withdrawal requests
+      operationId: processWithdrawal
+      tags:
+      - Withdrawals
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                schema:
+                  $ref: "#/definitions/Transaction"                  
