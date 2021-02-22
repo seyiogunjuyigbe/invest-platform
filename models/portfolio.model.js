@@ -29,4 +29,14 @@ const portfolioSchema = new Schema(
   },
   { timestamps: true }
 );
+
+portfolioSchema.methods.getInvestorCount = async function getInvestorCount() {
+  // eslint-disable-next-line
+  const User = require('./user.model');
+
+  return User.countDocuments({
+    type: 'investor',
+    portfolios: this.id,
+  });
+};
 module.exports = mongoose.model('Portfolio', portfolioSchema);
