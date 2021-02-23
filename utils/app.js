@@ -36,6 +36,9 @@ exports.createReference = function createReference(type) {
     case 'refund':
       prefix = 'BGIP_RFD';
       break;
+    case 'return':
+      prefix = 'BGIP_RTN';
+      break;
     default:
       break;
   }

@@ -166,7 +166,7 @@ investmentSchema.methods.creditReturn = async function creditReturn(
     capitalGains: newCapitalGains,
   });
 
-  return InvestmentReturn.create({
+  const invReturn = await InvestmentReturn.create({
     amount,
     creditedBy,
     currentBalance: newBalance,
@@ -177,6 +177,21 @@ investmentSchema.methods.creditReturn = async function creditReturn(
     previousBalance: this.currentBalance,
     investment: this.id,
     user: this.user,
+  });
+
+  return Transaction.create({
+    amount,
+    type: 'return',
+    status: 'successful',
+    reference: createReference('return'),
+    processor: 'system',
+    paymentType: 'return',
+    user: this.user,
+    description: `Return for investment(${this.id})`,
+    sourceType: 'InvestmentReturn',
+    sourceId: invReturn.id,
+    destinationType: 'Investment',
+    destinationId: this.id,
   });
 };
 
