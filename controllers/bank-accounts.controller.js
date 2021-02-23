@@ -4,7 +4,7 @@ const BankAccount = require('../models/bank.account.model');
 const flutterwaveService = require('../services/flutterwave.service');
 
 const flutterwave = flutterwaveService.getInstance();
-const { response } = require('../middlewares/api-response');
+const response = require('../middlewares/api-response');
 
 class BankController {
   static async fetchBanks(req, res, next) {

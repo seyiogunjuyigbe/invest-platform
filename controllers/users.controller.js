@@ -3,14 +3,14 @@ const { customAlphabet } = require('nanoid');
 const moment = require('moment');
 const { validate } = require('../utils/validator');
 const Otp = require('../models/otp.model');
-const { sendMail } = require('../services/mail.service');
+const { sendMail, sendSMS } = require('../services/message.service');
 const User = require('../models/user.model');
 const WalletHistory = require('../models/wallet.history.model');
 const { find, findOne } = require('../utils/query');
 const flutterwaveService = require('../services/flutterwave.service');
 
 const flutterwave = flutterwaveService.getInstance();
-const { response } = require('../middlewares/api-response');
+const response = require('../middlewares/api-response');
 
 class UsersController {
   static async createUser(req, res, next) {
@@ -25,8 +25,8 @@ class UsersController {
         expiry,
       });
       const message = `Use this code to verify your email ${otp.otp}. This code expires in 1 hour`;
-      console.log({ otp });
       await sendMail('Verify your email', user.email, message);
+      await sendSMS(user.phone, message);
       return res.status(200).json({
         message: 'user created successfully',
         data: user,

@@ -7,8 +7,8 @@ const { findOne, find } = require('../utils/query');
 const Flutterwave = require('../services/flutterwave.service');
 const { createReference } = require('../utils/app');
 const { validate } = require('../utils/validator');
-const { response } = require('../middlewares/api-response');
-const { sendMail } = require('../services/mail.service');
+const response = require('../middlewares/api-response');
+const { sendMail } = require('../services/message.service');
 
 const { ADMIN_MAIL } = process.env;
 

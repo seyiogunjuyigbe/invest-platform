@@ -7,7 +7,8 @@ const moment = require('moment');
 const { validate } = require('../utils/validator');
 const User = require('../models/user.model');
 const Otp = require('../models/otp.model');
-const { sendMail } = require('../services/mail.service');
+const { sendMail, sendSMS } = require('../services/message.service');
+const response = require('../middlewares/api-response');
 
 class AuthController {
   static async login(req, res, next) {
@@ -104,6 +105,8 @@ class AuthController {
       });
       const message = `Use this code to reset your password: ${otp.otp}. This code expires in 1 hour`;
       await sendMail('Password Reset', user.email, message);
+      await sendSMS(user.phone, message);
+
       return res.status(200).json({
         message: 'A reset code has been sent to your email address',
       });
@@ -175,10 +178,10 @@ class AuthController {
         user,
         expiry,
       });
-      console.log({ otp });
 
       const message = `Use this code to verify your email ${otp.otp}. This code expires in 1 hour`;
       await sendMail('Verify your email', user.email, message);
+      await sendSMS(req.user.phone, message);
       return res
         .status(200)
         .json({ message: 'A reset code has been sent to your email address' });
@@ -229,6 +232,59 @@ class AuthController {
         ...req.user.toJSON(),
         totalInvested: await req.user.getTotalInvested(),
       });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async requestOtp(req, res, next) {
+    try {
+      await Otp.updateMany(
+        { user: req.user.id, isExpired: false, type: 'verification' },
+        { isExpired: true }
+      );
+      const expiry = moment.utc().add(1, 'hours');
+      const otp = await Otp.create({
+        otp: customAlphabet('0123456789', 6)(),
+        type: 'verification',
+        user: req.user.id,
+        expiry,
+      });
+      const message = `DO NOT SHARE. Use this code as OTP ${otp.otp}. This code expires in 1 hour`;
+      await sendMail('One Time Password', req.user.email, message);
+      await sendSMS(req.user.phone, message);
+      return response(res, 200, 'otp generated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyOtp(req, res, next) {
+    try {
+      const otp = await Otp.findOne({
+        otp: req.params.otp,
+        type: 'verification',
+        user: req.user.id,
+      });
+      if (!otp) {
+        return response(res, 403, 'invalid verification code');
+      }
+      if (
+        otp.isExpired ||
+        moment.utc(otp.expiry).diff(moment.utc(), 'hours') > 0
+      ) {
+        // expire the otp if it is just a date difference
+        otp.isExpired = true;
+        await otp.save();
+        return response(
+          res,
+          401,
+          'This code is expired. Please request a new one'
+        );
+      }
+      otp.isExpired = true;
+      await otp.save();
+      return response(res, 200, 'Otp verified successfully');
     } catch (err) {
       next(err);
     }
