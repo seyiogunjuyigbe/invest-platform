@@ -10,7 +10,7 @@ const { find, findOne } = require('../utils/query');
 const flutterwaveService = require('../services/flutterwave.service');
 
 const flutterwave = flutterwaveService.getInstance();
-const { response } = require('../middlewares/api_response');
+const { response } = require('../middlewares/api-response');
 
 class UsersController {
   static async createUser(req, res, next) {
@@ -202,7 +202,7 @@ class UsersController {
       await req.user.save();
       response(res, 200, 'bvn verified successfully');
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -221,58 +221,45 @@ class UsersController {
   }
 
   static validateRequest(
-    req,
+    body,
     isUpdate,
     isUserSignup,
     isBvnUpdate = false,
-    isBankUpdate = false
+    user
   ) {
-    const { user, body } = req;
     const fields = {
       type: {
         type: 'string',
-        required: !isUpdate && !isUserSignup && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isUserSignup && !isBvnUpdate,
         enum: ['investor', 'admin', 'superadmin'],
       },
       role: {
         type: 'string',
-        required: !isUpdate && !isUserSignup && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isUserSignup && !isBvnUpdate,
         enum: ['finance', 'non-finance', 'none'],
       },
       firstName: {
         type: 'string',
-        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isBvnUpdate,
       },
       lastName: {
         type: 'string',
-        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isBvnUpdate,
       },
       email: {
         type: 'string',
-        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isBvnUpdate,
       },
       phone: {
         type: 'string',
       },
       password: {
         type: 'string',
-        required: !isUpdate && !isBvnUpdate && !isBankUpdate,
+        required: !isUpdate && !isBvnUpdate,
       },
       bvn: {
         type: 'string',
         required: isBvnUpdate,
-      },
-      bankAccount: {
-        type: 'string',
-        required: isBankUpdate,
-      },
-      bankCode: {
-        type: 'string',
-        required: isBankUpdate,
-      },
-      bankName: {
-        type: 'string',
-        required: isBankUpdate,
       },
       isEmailVerifed: {
         type: 'string',

@@ -4,7 +4,7 @@ const BankAccount = require('../models/bank.account.model');
 const flutterwaveService = require('../services/flutterwave.service');
 
 const flutterwave = flutterwaveService.getInstance();
-const { response } = require('../middlewares/api_response');
+const { response } = require('../middlewares/api-response');
 
 class BankController {
   static async fetchBanks(req, res, next) {
@@ -36,14 +36,14 @@ class BankController {
 
   static async addBankAccount(req, res, next) {
     try {
-      BankController.validateRequest(req.body, false, false, false, true);
+      BankController.validateRequest(req.body, false);
       const { bankCode, bankName } = req.body;
       const verifyAcct = await flutterwave.verifyAccount(req.body);
       if (!verifyAcct) {
         return response(
           res,
           400,
-          'your bank details coud not be verified. please doube check and try again'
+          'your bank details coud not be verified. please double check and try again'
         );
         // bank account not resolved
       }
@@ -107,19 +107,45 @@ class BankController {
     }
   }
 
-  static validateRequest(body) {
+  static async verifyBankAccount(req, res, next) {
+    try {
+      BankController.validateRequest(req.body, true);
+      const bankAccount = await BankAccount.findById(req.params.bankAccountId);
+      if (!bankAccount) {
+        return response(res, 404, 'invalid bank account');
+      }
+      bankAccount.isVerified = req.body.status === 'approved';
+      bankAccount.verifiedBy = req.user.id;
+      await bankAccount.save();
+      return response(
+        res,
+        200,
+        'bank account updated successfully',
+        bankAccount
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static validateRequest(body, verify = false) {
     const fields = {
       bankAccount: {
         type: 'string',
-        required: true,
+        required: !verify,
       },
       bankCode: {
         type: 'string',
-        required: true,
+        required: !verify,
       },
       bankName: {
         type: 'string',
-        required: true,
+        required: !verify,
+      },
+      status: {
+        type: 'string',
+        enum: ['approved', 'declined'],
+        required: verify,
       },
     };
 

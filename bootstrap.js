@@ -10,6 +10,7 @@ async function seedSuperAdmin() {
     await User.create({
       type: 'superadmin',
       email: 'developer@techatpurplegate.com',
+      phone: '123456',
       password: 'sup3Rdup3rY0!',
       firstName: 'Super',
       lastName: 'Admin',

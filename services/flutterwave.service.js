@@ -112,19 +112,31 @@ module.exports = class Flutterwave {
   }
 
   async withdraw(options) {
-    const { amountNgn, reference, bankAccount, currency } = options;
-
+    const {
+      amountNgn,
+      reference,
+      bankAccount,
+      currency,
+      meta,
+      callback_url,
+    } = options;
     const payload = {
       reference,
       currency,
       amount: amountNgn,
-      account_bank: bankAccount.bank.code,
-      account_number: bankAccount.number,
-      seckey: this.config.secretKey,
+      account_bank: bankAccount.bankCode,
+      account_number: bankAccount.accountNumber,
       narration: 'Black Gold Investment Payout',
+      meta,
+      callback_url,
     };
-
-    return http.post(this.endpoints.raveCreateTransfer, payload);
+    const headers = { Authorization: `Bearer ${this.config.secretKey}` };
+    const resp = await http.post(
+      this.endpoints.raveCreateTransfer,
+      payload,
+      headers
+    );
+    return resp;
   }
 
   async getTransfer(options) {
@@ -142,18 +154,19 @@ module.exports = class Flutterwave {
       account_number: options.bankAccount,
       account_bank: options.bankCode,
     };
-    const response = await http.post(url, params, {
-      Authorization: `Bearer ${this.config.secretKey}`,
-    });
-
-    if (response && response.data) {
-      const { status } = response.data;
-      const responseCode = response.data.data.responsecode;
-
-      if (status === 'success' && responseCode === '00') {
-        // account name needed from response
-        return response.data.data;
+    try {
+      const response = await http.post(url, params, {
+        Authorization: `Bearer ${this.config.secretKey}`,
+      });
+      if (response && response.data) {
+        if (response.data.status === 'success' && response.data.data) {
+          // account name needed from response
+          return response.data.data;
+        }
+        return false;
       }
+    } catch (err) {
+      console.log({ err });
       return false;
     }
 
@@ -233,17 +246,30 @@ module.exports = class Flutterwave {
   }
 
   async verifyBvn(bvn) {
+    const url = `${this.endpoints.raveValidateBvn}/${bvn}`;
+    const headers = {
+      Authorization: `Bearer ${this.config.secretKey}`,
+    };
+    const response = await http.get(url, headers);
+    if (response && response.data) {
+      return response.status === 'success' ? response.data : false;
+    }
+    return false;
+  }
+
+  async getBalance(currency = 'NGN') {
     try {
-      const url = `${this.endpoints.raveValidateBvn}/${bvn}`;
+      const url = `${this.endpoints.raveGetBalance}/${currency}`;
       const headers = {
         Authorization: `Bearer ${this.config.secretKey}`,
       };
       const response = await http.get(url, headers);
       if (response && response.data) {
-        return response.data.status === 'success' ? response.data : false;
+        return response.status === 'success' ? response.data : false;
       }
       return false;
     } catch (error) {
+      console.log({ error });
       return false;
     }
   }

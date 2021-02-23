@@ -7,7 +7,7 @@ module.exports = function endpointsUtil() {
     raveVerifyPayment: `${flwBaseUrl}/flwv3-pug/getpaidx/api/verify`,
     raveTokenCharge: `${flwBaseUrl}/tokenized-charges`,
     raveValidatePayment: `${flwBaseUrl}/flwv3-pug/getpaidx/api/validatecharge`,
-    raveCreateTransfer: `${flwBaseUrl}/v2/gpx/transfers/create`,
+    raveCreateTransfer: `${flwBaseUrl}/transfers`,
     raveGetTransfer: `${flwBaseUrl}/v2/gpx/transfers`,
     raveListBanks: `${flwBaseUrl}/banks`,
     raveBeneficiaryUrl: `${flwBaseUrl}/beneficiaries`,
@@ -15,5 +15,6 @@ module.exports = function endpointsUtil() {
     raveGetTx: `${flwBaseUrl}/transactions`,
     raveValidateBvn: `${flwBaseUrl}/kyc/bvns`,
     raveVerifyAccount: `${flwBaseUrl}/accounts/resolve`,
+    raveGetBalance: `${flwBaseUrl}/balances`,
   };
 };

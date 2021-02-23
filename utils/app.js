@@ -33,6 +33,9 @@ exports.createReference = function createReference(type) {
     case 'payout':
       prefix = 'BGIP_PYT';
       break;
+    case 'refund':
+      prefix = 'BGIP_RFD';
+      break;
     default:
       break;
   }
