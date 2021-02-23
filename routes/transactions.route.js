@@ -5,6 +5,7 @@ const TransactionsController = require('../controllers/transactions.controller')
 const hasFinanceAccess = require('../middlewares/has-finance-access');
 const isInvestor = require('../middlewares/is-investor');
 const isAuthenticated = require('../middlewares/is-authenticated');
+const isAdmin = require('../middlewares/admin');
 
 router.get(
   '/',
@@ -30,5 +31,16 @@ router.post(
   hasFinanceAccess,
   TransactionsController.verifyTransaction
 );
-
+router.post(
+  '/withdraw',
+  isAuthenticated,
+  isInvestor,
+  TransactionsController.initiateWithdrawal
+);
+router.get(
+  '/:transactionId/process-withdrawal',
+  isAuthenticated,
+  isAdmin(),
+  TransactionsController.processWithdrawal
+);
 module.exports = router;

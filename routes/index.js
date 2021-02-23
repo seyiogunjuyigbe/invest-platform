@@ -10,7 +10,6 @@ const TransactionRoutes = require('./transactions.route');
 const DocumentRoutes = require('./document.route');
 const BankRoutes = require('./bank.route');
 const InvestmentRoutes = require('./investments.route');
-const WithdrawalRoutes = require('./withdrawal.route');
 const DashboardRoutes = require('./dashboard.route');
 
 router.use('/users', UserRoutes);
@@ -21,6 +20,5 @@ router.use('/transactions', TransactionRoutes);
 router.use('/documents', DocumentRoutes);
 router.use('/bank-accounts', BankRoutes);
 router.use('/investments', InvestmentRoutes);
-router.use('/withdrawals', WithdrawalRoutes);
 router.use('/dashboard', DashboardRoutes);
 module.exports = router;
