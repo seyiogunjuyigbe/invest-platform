@@ -1,22 +1,16 @@
 const express = require('express');
 
 const router = express.Router();
-const WithdrawCtrl = require('../controllers/withdrawal.controller');
+const Transaction = require('../controllers/transactions.controller');
 const isAuthenticated = require('../middlewares/is-authenticated');
-const isAdmin = require('../middlewares/admin');
+const isInvestor = require('../middlewares/is-investor');
+const hasFinanceAccess = require('../middlewares/has-finance-access');
 
-router.post('/', isAuthenticated, WithdrawCtrl.initiateWithdrawal);
-router.get('/', isAuthenticated, WithdrawCtrl.fetchWithdrawalRequests);
-router.get('/flw-callback/:transactionId', WithdrawCtrl.transactionCallback);
-router.get(
-  '/:transactionId',
-  isAuthenticated,
-  WithdrawCtrl.fetchWithdrawalRequest
-);
+router.post('/', isAuthenticated, isInvestor, Transaction.initiateWithdrawal);
 router.get(
   '/:transactionId/process',
   isAuthenticated,
-  isAdmin(),
-  WithdrawCtrl.processWithdrawal
+  hasFinanceAccess,
+  Transaction.processWithdrawal
 );
 module.exports = router;

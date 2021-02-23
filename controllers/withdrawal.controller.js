@@ -4,7 +4,6 @@ const { response } = require('../middlewares/api-response');
 const { validate } = require('../utils/validator');
 const flutterwaveService = require('../services/flutterwave.service');
 const { createReference } = require('../utils/app');
-const { find, findOne } = require('../utils/query');
 const { sendMail } = require('../services/mail.service');
 
 const { ADMIN_MAIL } = process.env;
@@ -78,95 +77,6 @@ class WithdrawController {
       return response(res, 400, withdrawalRequest.message, withdrawalRequest);
     } catch (error) {
       return next(error);
-    }
-  }
-
-  static async transactionCallback(req, res, next) {
-    try {
-      const { transactionId } = req.params;
-      const transaction = await Transaction.findById(transactionId).populate(
-        'user'
-      );
-      if (!transaction) {
-        return response(res, 404, 'invalid transaction id');
-      }
-      if (transaction.status !== 'pending') {
-        return response(res, 409, 'transaction already updated');
-      }
-      if (req.query.status === 'successful') {
-        transaction.status = 'successful';
-      } else {
-        transaction.status = 'failed';
-        // refund wallet debit
-        const { user, amount } = transaction;
-        const wallet = await user.getWallet();
-        const refund = await Transaction.create({
-          type: 'refund',
-          reference: createReference('refund'),
-          amount,
-          user: user.id,
-          description: 'refund to wallet',
-          sourceType: 'Wallet',
-          sourceId: wallet._id,
-          destinationType: 'Wallet',
-          destinationId: wallet._id,
-        });
-        await wallet.credit(refund);
-      }
-      await transaction.save();
-      return response(res, 200, 'transaction updated successfully');
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async fetchWithdrawalRequests(req, res, next) {
-    try {
-      if (
-        ['superadmin', 'admin'].includes(req.user.type) &&
-        !req.query.userId
-      ) {
-        return response(res, 400, 'user ID required');
-      }
-      const withdrawalRequests = await find(Transaction, req, {
-        type: 'withdrawal',
-        user: ['superadmin', 'admin'].includes(req.user.type)
-          ? req.query.userId
-          : req.user.id,
-      });
-      return response(
-        res,
-        200,
-        'withdrawal requests fetched successfully',
-        withdrawalRequests
-      );
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async fetchWithdrawalRequest(req, res, next) {
-    try {
-      if (
-        ['superadmin', 'admin'].includes(req.user.type) &&
-        !req.query.userId
-      ) {
-        return response(res, 400, 'user ID required');
-      }
-      const withdrawalRequest = await findOne(Transaction, req, {
-        type: 'withdrawal',
-        user: ['superadmin', 'admin'].includes(req.user.type)
-          ? req.query.userId
-          : req.user.id,
-      });
-      return response(
-        res,
-        200,
-        'withdrawal request fetched successfully',
-        withdrawalRequest
-      );
-    } catch (error) {
-      next(error);
     }
   }
 
