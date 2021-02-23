@@ -113,6 +113,7 @@ investmentSchema.methods.withdrawToWallet = async function withdrawToWallet(
     sourceId: this.id,
     destinationType: 'Wallet',
     destinationId: wallet.id,
+    investment: this.id,
   });
 
   await wallet.credit(transaction);
@@ -192,6 +193,7 @@ investmentSchema.methods.creditReturn = async function creditReturn(
     sourceId: invReturn.id,
     destinationType: 'Investment',
     destinationId: this.id,
+    investment: this.id,
   });
 };
 

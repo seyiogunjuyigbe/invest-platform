@@ -54,6 +54,7 @@ walletSchema.methods.fundInvestment = async function fundInvestment(
     destinationType: 'Investment',
     destinationId: investment.id,
     portfolio: investment.portfolio,
+    investment: investment.id,
   });
 
   await this.debit(transaction);
