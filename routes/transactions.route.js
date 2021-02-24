@@ -43,4 +43,6 @@ router.get(
   isAdmin(),
   TransactionsController.processWithdrawal
 );
+router.post('/webhook', TransactionsController.processWebhookData);
+
 module.exports = router;
