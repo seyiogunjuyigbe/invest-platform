@@ -67,7 +67,10 @@ class UsersController {
 
   static async getWalletHistories(req, res, next) {
     try {
-      const histories = await find(WalletHistory, req, { user: req.user.id });
+      const conditions = ['superadmin', 'admin'].includes(req.user.type)
+        ? {}
+        : { user: req.user.id };
+      const histories = await find(WalletHistory, req, conditions);
 
       return res.status(200).json({
         message: 'wallet histories retrieved successfully',
