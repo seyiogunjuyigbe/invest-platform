@@ -6,7 +6,6 @@ const { response } = require('../middlewares/api-response');
 class DocumentController {
   static async submitDocument(req, res, next) {
     try {
-      DocumentController.validateRequest(req.body, 'request');
       const existingDoc = await Document.findOne({
         user: req.user.id,
         status: 'pending',
@@ -35,7 +34,10 @@ class DocumentController {
 
   static async viewDocuments(req, res, next) {
     try {
-      const requests = await find(Document, req);
+      const conditions = ['superadmin', 'admin'].includes(req.user.type)
+        ? {}
+        : { user: req.user.id };
+      const requests = await find(Document, req, conditions);
       return response(
         res,
         200,
@@ -49,7 +51,10 @@ class DocumentController {
 
   static async viewDocument(req, res, next) {
     try {
-      const request = await findOne(Document, req);
+      const conditions = ['superadmin', 'admin'].includes(req.user.type)
+        ? {}
+        : { user: req.user.id };
+      const request = await findOne(Document, req, conditions);
       return response(
         res,
         200,
@@ -63,7 +68,7 @@ class DocumentController {
 
   static async updateDocument(req, res, next) {
     try {
-      DocumentController.validateRequest(req.body, 'update');
+      DocumentController.validateRequest(req.body);
       const { status, remarks } = req.body;
       const thisDoc = await Document.findById(req.params.docId).populate(
         'user'
@@ -90,24 +95,6 @@ class DocumentController {
     }
   }
 
-  static async viewMyDocs(req, res, next) {
-    try {
-      const docs = await find(Document, req, { user: req.user.id });
-      return response(res, 200, 'documents fetched successfully', docs);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async viewSingleDoc(req, res, next) {
-    try {
-      const doc = await findOne(Document, req, { user: req.user.id });
-      return response(res, 200, 'document fetched successfully', doc);
-    } catch (error) {
-      next(error);
-    }
-  }
-
   static async deleteMyDoc(req, res, next) {
     try {
       const doc = await Document.findOneAndDelete({
@@ -121,33 +108,18 @@ class DocumentController {
     }
   }
 
-  static validateRequest(body, action) {
-    let fields;
-    switch (action) {
-      case 'request':
-        fields = {
-          documentNumber: {
-            type: 'string',
-            required: false,
-          },
-        };
-        break;
-      case 'update':
-        fields = {
-          status: {
-            type: 'string',
-            required: true,
-            enum: ['pending', 'verified', 'declined'],
-          },
-          remarks: {
-            type: 'string',
-            required: false,
-          },
-        };
-        break;
-      default:
-        break;
-    }
+  static validateRequest(body) {
+    const fields = {
+      status: {
+        type: 'string',
+        required: true,
+        enum: ['pending', 'verified', 'declined'],
+      },
+      remarks: {
+        type: 'string',
+        required: false,
+      },
+    };
 
     validate(body, { properties: fields });
   }
