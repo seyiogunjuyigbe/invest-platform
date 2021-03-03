@@ -1,4 +1,4 @@
-module.exports = function adminRoute(criteria) {
+module.exports = function adminRoute(criteria = {}) {
   return async function adminRouteMiddleware(req, res, next) {
     if (!req.user) {
       return res.status(403).json({
