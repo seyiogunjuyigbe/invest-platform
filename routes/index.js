@@ -11,6 +11,7 @@ const DocumentRoutes = require('./document.route');
 const BankRoutes = require('./bank.route');
 const InvestmentRoutes = require('./investments.route');
 const DashboardRoutes = require('./dashboard.route');
+const WebhookRoutes = require('./webhook.route');
 
 router.use('/users', UserRoutes);
 router.use('/auth', AuthRoutes);
@@ -21,4 +22,5 @@ router.use('/documents', DocumentRoutes);
 router.use('/bank-accounts', BankRoutes);
 router.use('/investments', InvestmentRoutes);
 router.use('/dashboard', DashboardRoutes);
+router.use('/hooks', WebhookRoutes);
 module.exports = router;

@@ -43,4 +43,5 @@ router.get(
   isAdmin(),
   TransactionsController.processWithdrawal
 );
+
 module.exports = router;
