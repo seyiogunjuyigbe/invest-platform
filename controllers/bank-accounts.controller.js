@@ -62,6 +62,51 @@ class BankController {
     }
   }
 
+  static async addMultipleBankAccounts(req, res, next) {
+    try {
+      const errors = [];
+      let newAccounts;
+      BankController.validateRequest(req.body, false, true);
+      const accounts = await Promise.all(
+        req.body.accounts.map(async account => {
+          const verification = await flutterwave.verifyAccount(account);
+          if (!verification) {
+            errors.push({ account, verification });
+          } else {
+            return {
+              accountNumber: verification.account_number,
+              accountName: verification.account_name,
+              bankCode: account.bankCode,
+              user: req.user.id,
+              bankName: account.bankName,
+            };
+          }
+        })
+      );
+      if (accounts.length) {
+        newAccounts = await BankAccount.create(...accounts);
+        req.user.bankAccounts.addToSet(newAccounts);
+        await req.user.save();
+      }
+      return response(
+        res,
+        accounts.length ? 200 : 400,
+        `${
+          accounts.length
+            ? `${accounts.length} bank account(s) added successfully. ${
+                errors.length
+                  ? `${errors.length} entries could not be verified`
+                  : ``
+              }`
+            : `we could not verify your bank accounts. please retry`
+        }`,
+        newAccounts || null
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async removeBankAccount(req, res, next) {
     try {
       const bankAccount = await BankAccount.findOne({
@@ -128,24 +173,28 @@ class BankController {
     }
   }
 
-  static validateRequest(body, verify = false) {
+  static validateRequest(body, verify = false, multiple = false) {
     const fields = {
       bankAccount: {
         type: 'string',
-        required: !verify,
+        required: !verify && !multiple,
       },
       bankCode: {
         type: 'string',
-        required: !verify,
+        required: !verify && !multiple,
       },
       bankName: {
         type: 'string',
-        required: !verify,
+        required: !verify && !multiple,
       },
       status: {
         type: 'string',
         enum: ['approved', 'declined'],
-        required: verify,
+        required: verify && !multiple,
+      },
+      accounts: {
+        type: 'array',
+        required: !verify && multiple,
       },
     };
 
