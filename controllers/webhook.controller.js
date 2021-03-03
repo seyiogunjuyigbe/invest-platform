@@ -60,7 +60,7 @@ class WebhookController {
       }
       const title = `${transaction.type} ${status}`;
       const message = `Your withdrawal of ${transaction.amount} was ${status}`;
-      await sendPushNotification(user._id, title, message);
+      await sendPushNotification([user._id], title, message);
       await createNotification([user], title, message, true);
       await transaction.save();
 
