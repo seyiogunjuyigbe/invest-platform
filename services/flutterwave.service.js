@@ -159,18 +159,15 @@ module.exports = class Flutterwave {
         Authorization: `Bearer ${this.config.secretKey}`,
       });
       if (response && response.data) {
-        if (response.data.status === 'success' && response.data.data) {
-          // account name needed from response
-          return response.data.data;
+        if (response.status === 'success' && response.data) {
+          return response.data;
         }
-        return false;
       }
+      return false;
     } catch (err) {
       console.log({ err });
       return false;
     }
-
-    return false;
   }
 
   isSuccessful({ status }) {
