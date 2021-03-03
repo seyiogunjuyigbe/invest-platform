@@ -1,0 +1,1 @@
+exports.PENALTY_FEE_PERCENT = 10;

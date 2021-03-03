@@ -39,6 +39,9 @@ exports.createReference = function createReference(type) {
     case 'return':
       prefix = 'BGIP_RTN';
       break;
+    case 'penalty':
+      prefix = 'BGIP_PEN';
+      break;
     default:
       break;
   }

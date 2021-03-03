@@ -24,6 +24,12 @@ router.post(
   InvestmentsController.fundInvestment
 );
 router.post(
+  '/:investmentId/cancel',
+  isAuthenticated,
+  hasFinanceAccess,
+  InvestmentsController.cancelInvestment
+);
+router.post(
   '/:investmentId/credit-return',
   isAuthenticated,
   adminRoute(),
