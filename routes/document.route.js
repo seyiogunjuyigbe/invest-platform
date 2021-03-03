@@ -13,21 +13,8 @@ router.post(
   DocCtrl.submitDocument
 );
 
-router.get('/', isAuthenticated, DocCtrl.viewMyDocs);
-router.get('/requests', isAuthenticated, DocCtrl.viewMyDocs);
-router.get('/:docId', isAuthenticated, DocCtrl.viewSingleDoc);
+router.get('/', isAuthenticated, DocCtrl.viewDocuments);
+router.get('/:docId', isAuthenticated, DocCtrl.viewDocument);
 router.delete('/:docId', isAuthenticated, DocCtrl.deleteMyDoc);
-
-router.get(
-  '/requests/:docId',
-  isAuthenticated,
-  adminRoute(),
-  DocCtrl.viewDocuments
-);
-router.put(
-  '/requests/:docId',
-  isAuthenticated,
-  adminRoute(),
-  DocCtrl.updateDocument
-);
+router.put('/:docId', isAuthenticated, adminRoute(), DocCtrl.updateDocument);
 module.exports = router;

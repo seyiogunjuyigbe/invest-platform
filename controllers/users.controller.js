@@ -67,7 +67,10 @@ class UsersController {
 
   static async getWalletHistories(req, res, next) {
     try {
-      const histories = await find(WalletHistory, req, { user: req.user.id });
+      const conditions = ['superadmin', 'admin'].includes(req.user.type)
+        ? {}
+        : { user: req.user.id };
+      const histories = await find(WalletHistory, req, conditions);
 
       return res.status(200).json({
         message: 'wallet histories retrieved successfully',
@@ -220,13 +223,8 @@ class UsersController {
     }
   }
 
-  static validateRequest(
-    body,
-    isUpdate,
-    isUserSignup,
-    isBvnUpdate = false,
-    user
-  ) {
+  static validateRequest(req, isUpdate, isUserSignup, isBvnUpdate = false) {
+    const { body, user } = req;
     const fields = {
       type: {
         type: 'string',
@@ -294,7 +292,7 @@ class UsersController {
       identificationDocNumber: {
         type: 'string',
       },
-      ...(['superadmin', 'admin'].includes(user.type)
+      ...(['superadmin', 'admin'].includes(user ? user.type : '')
         ? {
             status: {
               type: 'string',
