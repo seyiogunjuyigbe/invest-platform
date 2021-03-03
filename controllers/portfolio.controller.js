@@ -1,7 +1,9 @@
 const moment = require('moment');
 const Portfolio = require('../models/portfolio.model');
+const User = require('../models/user.model');
 const { find, findOne } = require('../utils/query');
 const { validate } = require('../utils/validator');
+const { sendPushNotification } = require('../services/notification.service');
 
 class PortfolioController {
   static async createPortfolio(req, res, next) {
@@ -31,6 +33,12 @@ class PortfolioController {
           });
         }
       }
+      // send push notification to all active users;
+      const users = await User.find({ status: 'active' });
+      const userIds = users.map(user => user._id);
+      const title = `New Portfolio`;
+      const message = `A new ${portfolio.category} investment portfolio is now available`;
+      await sendPushNotification(userIds, title, message);
       return res
         .status(200)
         .json({ message: 'portfolio created successfully', data: portfolio });
