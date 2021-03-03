@@ -6,7 +6,7 @@ const otpSchema = new Schema(
     otp: String,
     type: {
       type: String,
-      enum: ['reset-password', 'verify-email'],
+      enum: ['reset-password', 'verify-email', 'verification'],
     },
     user: {
       type: Schema.Types.ObjectId,

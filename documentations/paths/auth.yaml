@@ -183,3 +183,58 @@
           description: Unexpected server error
           schema:
             example:           
+  /auth/request-otp:
+    get:
+      summary: Request Otp for User Verification
+      description: Initiate verification by sending otp to the user
+      operationId: requestOtp
+      tags:
+      - Authentication
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              message: OTP sent
+        400:
+          description: Bad request
+          schema:
+            examples:
+              message: Token is either invalid or email does not exist
+
+  /auth/verify-otp/{otp}:
+    get:
+      summary: Verifies verification OTP
+      tags:
+      - Authentication
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: path
+          name: otp
+          description: otp verification sent to the user
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              verified: true
+        400:
+          description: Bad request
+          schema:
+            example:
+              message: "Missing required parameters (code: invalid_token | token_expired)"
+        500:
+          description: Unexpected server error
+          schema:
+            example:
+              message: An unexpected error occured
+

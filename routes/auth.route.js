@@ -11,5 +11,7 @@ router.get('/recover-password', AuthController.requestPasswordReset);
 router.post('/reset-password/:otp', AuthController.resetPassword);
 router.get('/resend-verification', AuthController.resendVerificationToken);
 router.get('/profile', isAuthenticated, AuthController.fetchProfile);
+router.get('/request-otp', isAuthenticated, AuthController.requestOtp);
+router.get('/verify-otp/:otp', isAuthenticated, AuthController.verifyOtp);
 
 module.exports = router;

@@ -38,7 +38,8 @@
     "pluralize": "^8.0.0",
     "pug": "^3.0.0",
     "pusher": "^4.0.2",
-    "superagent": "^6.1.0"
+    "superagent": "^6.1.0",
+    "twilio": "^3.56.0"
   },
   "devDependencies": {
     "eslint": "^7.18.0",

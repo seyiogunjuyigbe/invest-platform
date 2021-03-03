@@ -4,6 +4,10 @@ const createError = require('http-errors');
 const { currCalc, createReference } = require('../utils/app');
 const WalletHistory = require('./wallet.history.model');
 const Transaction = require('./transaction.model');
+const {
+  sendPushNotification,
+  createNotification,
+} = require('../services/notification.service');
 
 const { Schema } = mongoose;
 
@@ -81,8 +85,7 @@ walletSchema.methods.credit = async function credit(transaction) {
     balance: newBalance,
     previousBalance: this.balance,
   });
-
-  return WalletHistory.create({
+  const walletHistory = await WalletHistory.create({
     amount: transaction.amount,
     type: 'credit',
     balance: newBalance,
@@ -92,6 +95,11 @@ walletSchema.methods.credit = async function credit(transaction) {
     wallet: this.id,
     user: this.user,
   });
+  const title = 'Wallet Credit';
+  const message = `${transaction.amount} was credited to your wallet`;
+  await createNotification([this.user], title, message, true);
+  await sendPushNotification([this.user._id], title, message);
+  return walletHistory;
 };
 
 walletSchema.methods.debit = async function debit(transaction) {
@@ -105,8 +113,7 @@ walletSchema.methods.debit = async function debit(transaction) {
     balance: newBalance,
     previousBalance: this.balance,
   });
-
-  return WalletHistory.create({
+  const walletHistory = await WalletHistory.create({
     amount: transaction.amount,
     type: 'debit',
     balance: newBalance,
@@ -116,6 +123,11 @@ walletSchema.methods.debit = async function debit(transaction) {
     wallet: this.id,
     user: this.user,
   });
+  const title = 'Wallet Debit';
+  const message = `${transaction.amount} was debited from your wallet`;
+  await createNotification([this.user], title, message, true);
+  await sendPushNotification([this.user._id], title, message);
+  return walletHistory;
 };
 
 module.exports = mongoose.model('Wallet', walletSchema);
