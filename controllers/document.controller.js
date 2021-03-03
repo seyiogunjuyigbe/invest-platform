@@ -1,7 +1,7 @@
 const Document = require('../models/document.model');
 const { find, findOne } = require('../utils/query');
 const { validate } = require('../utils/validator');
-const { response } = require('../middlewares/api-response');
+const response = require('../middlewares/api-response');
 
 class DocumentController {
   static async submitDocument(req, res, next) {
