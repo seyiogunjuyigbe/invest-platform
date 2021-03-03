@@ -194,6 +194,23 @@ class BankController {
       },
       accounts: {
         type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            bankAccount: {
+              type: 'string',
+              required: !verify && multiple,
+            },
+            bankCode: {
+              type: 'string',
+              required: !verify && multiple,
+            },
+            bankName: {
+              type: 'string',
+              required: !verify && multiple,
+            },
+          },
+        },
         required: !verify && multiple,
       },
     };
