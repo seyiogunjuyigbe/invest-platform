@@ -91,6 +91,28 @@
           schema:
             $ref: "#/definitions/Investment"
 
+  /investments/{investmentId}/cancel:
+    post:
+      summary: cancel / opt-out of investment
+      description: cancel / opt-out of investment
+      operationId: cancelInvestment
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'investment cancelled and funds deposited into wallet'
+
   /investments/{investmentId}/credit-return:
     post:
       summary: credit investment return - admin only

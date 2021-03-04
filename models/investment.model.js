@@ -7,6 +7,7 @@ const Portfolio = require('./portfolio.model');
 const InvestmentReturn = require('./investment.return.model');
 const Wallet = require('./wallet.model');
 const { currCalc, createReference } = require('../utils/app');
+const { PENALTY_FEE_PERCENT } = require('../utils/constants');
 
 const { Schema } = mongoose;
 const investmentSchema = new Schema(
@@ -124,8 +125,8 @@ investmentSchema.methods.withdrawToWallet = async function withdrawToWallet(
   });
 };
 
-investmentSchema.methods.payout = async function payout() {
-  await this.withdrawToWallet(this.currentBalance, 'payout');
+investmentSchema.methods.payout = async function payout(amount = 0) {
+  await this.withdrawToWallet(amount || this.currentBalance, 'payout');
 
   return this.updateOne({
     isClosed: true,
@@ -194,7 +195,41 @@ investmentSchema.methods.creditReturn = async function creditReturn(
     destinationType: 'Investment',
     destinationId: this.id,
     investment: this.id,
+    portfolio: this.portfolio,
   });
+};
+
+investmentSchema.methods.cancel = async function cancel() {
+  let amountPayable = this.currentBalance;
+
+  if (m.utc(this.maturityDate).isAfter(m.utc())) {
+    const penaltyFee = currCalc(
+      currCalc(PENALTY_FEE_PERCENT, '/', 100),
+      '*',
+      this.capital
+    );
+
+    amountPayable = currCalc(this.currentBalance, '-', penaltyFee);
+
+    await Transaction.create({
+      amount: penaltyFee,
+      type: 'penalty',
+      status: 'successful',
+      reference: createReference('penalty'),
+      processor: 'system',
+      paymentType: 'penalty',
+      user: this.user,
+      description: `Penalty for cancelling investment(${this.id})`,
+      sourceType: 'Investment',
+      sourceId: this.id,
+      destinationType: 'System',
+      destinationId: '',
+      investment: this.id,
+      portfolio: this.portfolio,
+    });
+  }
+
+  return this.payout(amountPayable);
 };
 
 module.exports = mongoose.model('Investment', investmentSchema);

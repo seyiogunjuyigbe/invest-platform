@@ -88,6 +88,39 @@ class InvestmentsController {
     }
   }
 
+  static async cancelInvestment(req, res, next) {
+    try {
+      const user = ['superadmin', 'admin'].includes(req.user.type)
+        ? await User.findById(req.body.userId)
+        : req.user;
+
+      if (!user) {
+        throw createError(400, 'invalid user info');
+      }
+
+      const investment = await Investment.findOne({
+        _id: req.params.investmentId,
+        user: user.id,
+      });
+
+      if (!investment) {
+        throw createError(404, 'investment not found');
+      }
+
+      if (investment.isClosed) {
+        throw createError(422, 'you cannot cancel a closed investment');
+      }
+
+      await investment.cancel();
+
+      return res.status(200).json({
+        message: 'investment cancelled and funds deposited into wallet',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async creditInvestmentReturn(req, res, next) {
     try {
       const user = await User.findById(req.body.userId);
