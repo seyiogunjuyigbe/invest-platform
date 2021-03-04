@@ -95,10 +95,13 @@ walletSchema.methods.credit = async function credit(transaction) {
     wallet: this.id,
     user: this.user,
   });
-  const title = 'Wallet Credit';
-  const message = `${transaction.amount} was credited to your wallet`;
-  await createNotification([this.user], title, message, true);
-  await sendPushNotification([this.user._id], title, message);
+  if (transaction.type === 'deposit' && this.user.fundWalletAlert) {
+    const title = 'Wallet Credit';
+    const message = `${transaction.amount} was credited to your wallet`;
+    await createNotification([this.user], title, message, true);
+    await sendPushNotification([this.user._id], title, message);
+  }
+
   return walletHistory;
 };
 
@@ -123,10 +126,12 @@ walletSchema.methods.debit = async function debit(transaction) {
     wallet: this.id,
     user: this.user,
   });
-  const title = 'Wallet Debit';
-  const message = `${transaction.amount} was debited from your wallet`;
-  await createNotification([this.user], title, message, true);
-  await sendPushNotification([this.user._id], title, message);
+  if (transaction.type === 'withdrawal' && this.user.withdrawalAlert) {
+    const title = 'Wallet Debit';
+    const message = `${transaction.amount} was debited from your wallet`;
+    await createNotification([this.user], title, message, true);
+    await sendPushNotification([this.user._id], title, message);
+  }
   return walletHistory;
 };
 

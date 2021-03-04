@@ -34,7 +34,10 @@ class PortfolioController {
         }
       }
       // send push notification to all active users;
-      const users = await User.find({ status: 'active' });
+      const users = await User.find({
+        status: 'active',
+        newInvestmentAlert: true,
+      });
       const userIds = users.map(user => user._id);
       const title = `New Portfolio`;
       const message = `A new ${portfolio.category} investment portfolio is now available`;

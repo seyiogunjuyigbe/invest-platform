@@ -88,6 +88,26 @@ const UserSchema = new Schema(
         default: [],
       },
     ],
+    investmentMaturityAlert: {
+      type: Boolean,
+      default: true,
+    },
+    fundWalletAlert: {
+      type: Boolean,
+      default: true,
+    },
+    withdrawalAlert: {
+      type: Boolean,
+      default: true,
+    },
+    newInvestmentAlert: {
+      type: Boolean,
+      default: true,
+    },
+    updateAlert: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
