@@ -292,6 +292,21 @@ class UsersController {
       identificationDocNumber: {
         type: 'string',
       },
+      investmentMaturityAlert: {
+        type: 'boolean',
+      },
+      fundWalletAlert: {
+        type: 'boolean',
+      },
+      withdrawalAlert: {
+        type: 'boolean',
+      },
+      newInvestmentAlert: {
+        type: 'boolean',
+      },
+      updateAlert: {
+        type: 'boolean',
+      },
       ...(['superadmin', 'admin'].includes(user ? user.type : '')
         ? {
             status: {
