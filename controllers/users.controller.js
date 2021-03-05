@@ -110,7 +110,9 @@ class UsersController {
       if (!user) {
         throw createError('404', 'user not found');
       }
-
+      if (req.file) {
+        req.body.avatar = req.file.path;
+      }
       await user.updateOne(req.body);
 
       return res.status(200).json({
@@ -258,9 +260,6 @@ class UsersController {
       bvn: {
         type: 'string',
         required: isBvnUpdate,
-      },
-      isEmailVerifed: {
-        type: 'string',
       },
       dateOfBirth: {
         type: 'string',
