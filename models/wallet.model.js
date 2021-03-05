@@ -96,8 +96,14 @@ walletSchema.methods.credit = async function credit(transaction) {
     user: this.user,
   });
   if (transaction.type === 'deposit' && this.user.fundWalletAlert) {
+    const format = new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 2,
+      currencyDisplay: 'symbol',
+    });
     const title = 'Wallet Credit';
-    const message = `${transaction.amount} was credited to your wallet`;
+    const message = `${format(transaction.amount)} was credited to your wallet`;
     await createNotification([this.user], title, message, true);
     await sendPushNotification([this.user._id], title, message);
   }
@@ -127,8 +133,16 @@ walletSchema.methods.debit = async function debit(transaction) {
     user: this.user,
   });
   if (transaction.type === 'withdrawal' && this.user.withdrawalAlert) {
+    const format = new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 2,
+      currencyDisplay: 'symbol',
+    });
     const title = 'Wallet Debit';
-    const message = `${transaction.amount} was debited from your wallet`;
+    const message = `${format(
+      transaction.amount
+    )} was debited from your wallet`;
     await createNotification([this.user], title, message, true);
     await sendPushNotification([this.user._id], title, message);
   }

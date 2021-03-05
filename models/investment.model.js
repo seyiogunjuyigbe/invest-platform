@@ -132,8 +132,14 @@ investmentSchema.methods.withdrawToWallet = async function withdrawToWallet(
 investmentSchema.methods.payout = async function payout(amount = 0) {
   await this.withdrawToWallet(amount || this.currentBalance, 'payout');
   if (this.user.investmentMaturityAlert) {
+    const format = new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 2,
+      currencyDisplay: 'symbol',
+    });
     const title = 'Investment Payout';
-    const message = `${amount}has been paid to your wallet`;
+    const message = `${format(amount)} has been paid to your wallet`;
     await createNotification([this.user], title, message, true);
     await sendPushNotification([this.user._id], title, message);
   }
