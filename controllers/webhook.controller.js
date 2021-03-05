@@ -2,10 +2,6 @@ const Transaction = require('../models/transaction.model');
 const { createReference } = require('../utils/app');
 const { validate } = require('../utils/validator');
 const { response } = require('../middlewares/api-response');
-const {
-  sendPushNotification,
-  createNotification,
-} = require('../services/notification.service');
 
 class WebhookController {
   static async processWebhookData(req, res, next) {
@@ -58,10 +54,6 @@ class WebhookController {
           await transaction.processPayment();
         }
       }
-      const title = `${transaction.type} ${status}`;
-      const message = `Your withdrawal of ${transaction.amount} was ${status}`;
-      await sendPushNotification([user._id], title, message);
-      await createNotification([user], title, message, true);
       await transaction.save();
 
       return response(res, 200, 'transaction updated successfully');

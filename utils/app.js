@@ -73,3 +73,15 @@ exports.asyncSeries = async function asyncSeries(array, callback, useIndex) {
     return useIndex ? callback(nextItem, index) : callback(nextItem);
   }, Promise.resolve());
 };
+exports.formatAmountToCurrency = function formatAmountToCurrency(
+  number,
+  currency = 'NGN'
+) {
+  const format = new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    currencyDisplay: 'symbol',
+  });
+  return format(number);
+};
