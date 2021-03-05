@@ -6,7 +6,11 @@ const Transaction = require('./transaction.model');
 const Portfolio = require('./portfolio.model');
 const InvestmentReturn = require('./investment.return.model');
 const Wallet = require('./wallet.model');
-const { currCalc, createReference } = require('../utils/app');
+const {
+  currCalc,
+  createReference,
+  formatAmountToCurrency,
+} = require('../utils/app');
 const { PENALTY_FEE_PERCENT } = require('../utils/constants');
 const {
   sendPushNotification,
@@ -132,14 +136,10 @@ investmentSchema.methods.withdrawToWallet = async function withdrawToWallet(
 investmentSchema.methods.payout = async function payout(amount = 0) {
   await this.withdrawToWallet(amount || this.currentBalance, 'payout');
   if (this.user.investmentMaturityAlert) {
-    const format = new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 2,
-      currencyDisplay: 'symbol',
-    });
     const title = 'Investment Payout';
-    const message = `${format(amount)} has been paid to your wallet`;
+    const message = `${formatAmountToCurrency(
+      amount
+    )} has been paid to your wallet`;
     await createNotification([this.user], title, message, true);
     await sendPushNotification([this.user._id], title, message);
   }
