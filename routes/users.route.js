@@ -4,6 +4,7 @@ const router = express.Router();
 const UsersController = require('../controllers/users.controller');
 const adminRoute = require('../middlewares/admin');
 const isAuthenticated = require('../middlewares/is-authenticated');
+const upload = require('../middlewares/multer');
 
 router.post('/', isAuthenticated, adminRoute(), UsersController.createUser);
 router.post('/signup', UsersController.createUser);
@@ -22,7 +23,12 @@ router.get(
   UsersController.verifyUserBvnAsAdmin
 );
 router.get('/:userId', isAuthenticated, UsersController.fetchUser);
-router.put('/:userId', isAuthenticated, UsersController.updateUser);
+router.put(
+  '/:userId',
+  isAuthenticated,
+  upload.single('avatar'),
+  UsersController.updateUser
+);
 router.delete(
   '/:userId',
   isAuthenticated,

@@ -108,6 +108,7 @@ const UserSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    avatar: String,
   },
   {
     timestamps: true,
