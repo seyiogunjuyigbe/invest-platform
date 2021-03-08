@@ -116,7 +116,7 @@ class UsersController {
       await user.updateOne(req.body);
 
       return res.status(200).json({
-        message: 'users retrieved successfully',
+        message: 'user updated successfully',
       });
     } catch (error) {
       next(error);
@@ -316,7 +316,7 @@ class UsersController {
         : {}),
     };
 
-    validate(body, { properties: fields }, isUpdate);
+    validate({ ...body }, { properties: fields }, isUpdate);
   }
 }
 
