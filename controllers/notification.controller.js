@@ -2,6 +2,9 @@ const Notification = require('../models/notification.model');
 const response = require('../middlewares/api-response');
 const { find, findOne } = require('../utils/query');
 const { validate } = require('../utils/validator');
+const {
+  generateNotificationToken,
+} = require('../services/notification.service');
 
 class NotificationController {
   static async fetchNotifications(req, res, next) {
@@ -51,6 +54,22 @@ class NotificationController {
       }
       await Notification.updateMany(conditions, { isRead: true });
       return response(res, 200, 'notifications marked as read');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async generatePushNotificatioToken(req, res, next) {
+    try {
+      const notificationToken = await generateNotificationToken(req.user);
+      return response(
+        res,
+        notificationToken ? 200 : 400,
+        notificationToken
+          ? 'notification token generated successfully'
+          : 'an error occurred, token could not be generated',
+        notificationToken
+      );
     } catch (error) {
       next(error);
     }

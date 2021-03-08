@@ -57,4 +57,21 @@
         200:
           description: Success
           schema:
-            $ref: "#/definitions/Notification"         
+            $ref: "#/definitions/Notification"    
+  /notifications/get-token:
+    get:
+      summary: get notification token
+      description: get notification token
+      operationId: getNotificationToken
+      tags:
+      - Notifications
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          type: string
+          example: new_notification_token                 

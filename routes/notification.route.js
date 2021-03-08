@@ -4,7 +4,13 @@ const isAuthenticated = require('../middlewares/is-authenticated');
 
 router.get('/', isAuthenticated, NotificationContoller.fetchNotifications);
 router.get(
-  '/notificationId',
+  '/get-token',
+  isAuthenticated,
+  NotificationContoller.generatePushNotificatioToken
+);
+
+router.get(
+  '/:notificationId',
   isAuthenticated,
   NotificationContoller.fetchNotification
 );
