@@ -117,6 +117,7 @@ class UsersController {
 
       return res.status(200).json({
         message: 'user updated successfully',
+        data: await User.findById(user.id),
       });
     } catch (error) {
       next(error);
