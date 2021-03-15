@@ -49,6 +49,7 @@ const TransactionSchema = new Schema(
     amount: {
       type: Number,
       required: true,
+      min: [0, 'invalid transaction amount'],
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,

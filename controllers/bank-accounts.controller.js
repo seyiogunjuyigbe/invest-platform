@@ -67,7 +67,7 @@ class BankController {
       const errors = [];
       let newAccounts;
       BankController.validateRequest(req.body, false, true);
-      const accounts = await Promise.all(
+      let accounts = await Promise.all(
         req.body.accounts.map(async account => {
           const verification = await flutterwave.verifyAccount(account);
           if (!verification) {
@@ -83,9 +83,13 @@ class BankController {
           }
         })
       );
+      accounts = accounts.filter(account => account);
+      console.log(accounts);
       if (accounts.length) {
-        newAccounts = await BankAccount.create(...accounts);
-        req.user.bankAccounts.addToSet(newAccounts);
+        newAccounts = await BankAccount.create(accounts);
+        newAccounts.forEach(acct => {
+          req.user.bankAccounts.addToSet(acct._id);
+        });
         await req.user.save();
       }
       return response(

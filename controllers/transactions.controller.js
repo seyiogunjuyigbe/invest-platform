@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 
+const m = require('moment');
 const Transaction = require('../models/transaction.model');
 const BankAccount = require('../models/bank.account.model');
 
@@ -18,7 +19,12 @@ class TransactionsController {
   static async initiateTransaction(req, res, next) {
     try {
       TransactionsController.validateRequest(req.body);
-
+      if (
+        Number(req.body.amount) < 0 ||
+        Number.isNaN(Number(req.body.amount))
+      ) {
+        return response(res, 400, 'please input a valid amount');
+      }
       const transaction = await Transaction.create({
         user: req.user.id,
         description: 'wallet deposit',
@@ -88,9 +94,31 @@ class TransactionsController {
       const conditions = ['superadmin', 'admin'].includes(req.user.type)
         ? {}
         : { user: req.user.id };
+      const { from, to } = req.query;
+      delete req.query.from;
+      delete req.query.to;
 
       const histories = await find(Transaction, req, conditions);
-
+      if (from) {
+        histories.data = !histories.data.length
+          ? []
+          : histories.data.filter(data =>
+              m
+                .utc(from.replace(/\//g, '-'))
+                .startOf('day')
+                .isSameOrBefore(m.utc(data.createdAt).startOf('day'))
+            );
+      }
+      if (to) {
+        histories.data = !histories.data.length
+          ? []
+          : histories.data.filter(data =>
+              m
+                .utc(to.replace(/\//g, '-'))
+                .startOf('day')
+                .isSameOrAfter(m.utc(data.createdAt).startOf('day'))
+            );
+      }
       return res.status(200).json({
         message: 'transaction histories retrieved successfully',
         data: histories,

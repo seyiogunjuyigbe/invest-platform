@@ -1,6 +1,7 @@
 const createError = require('http-errors');
 const { customAlphabet } = require('nanoid');
 const moment = require('moment');
+const jwt = require('jsonwebtoken');
 const { validate } = require('../utils/validator');
 const Otp = require('../models/otp.model');
 const { sendMail, sendSMS } = require('../services/message.service');
@@ -144,16 +145,49 @@ class UsersController {
 
   static async verifyBvn(req, res, next) {
     UsersController.validateRequest(req, false, false, true);
+    console.log(req.user);
     try {
+      const testBvnList = [
+        '0123456789',
+        '0101010101',
+        '9876543210',
+        '0000000000',
+        '1111111111',
+        '2222222222',
+        '3333333333',
+        '4444444444',
+        '1223222143',
+        '5335445455',
+      ];
       const { bvn } = req.body;
-      const duplicateUser = await User.findOne({ bvn });
-      if (duplicateUser) {
+      const duplicateUser = await User.findOne({
+        bvn: jwt.sign(bvn, process.env.JWT_SECRET),
+      });
+      if (
+        duplicateUser &&
+        req.user.id.toString() !== duplicateUser._id.toString()
+      ) {
         return response(
           res,
           400,
           'this bvn is already matched with another user'
         );
       }
+      const { firstName, lastName, dateOfBirth } = req.user;
+
+      // check if test
+      if (testBvnList.includes(bvn)) {
+        req.user.set({
+          isBVNVerified: true,
+          bvn,
+          bvnFirstName: firstName,
+          bvnLastName: lastName,
+          bvnDateOfBirth: dateOfBirth,
+        });
+        await req.user.save();
+        return response(res, 200, 'bvn verified successfully');
+      }
+
       // attempt bvn verification
       const bvnDetails = await flutterwave.verifyBvn(bvn);
 
@@ -180,18 +214,14 @@ class UsersController {
         bvnDateOfBirth: date_of_birth,
         bvnPhoneNumber: phone_number,
       });
-      const check = () => {
-        const { firstName, lastName, dateOfBirth } = req.user;
-        return (
-          (first_name.toLowerCase() !== firstName.toLowercase() &&
-            first_name.toLowerCase() !== lastName.toLowercase()) ||
-          (last_name.toLowerCase() !== lastName.toLowercase() &&
-            last_name.toLowerCase() !== firstName.toLowercase()) ||
-          (middle_name.toLowerCase() !== lastName.toLowercase() &&
-            middle_name.toLowerCase() !== firstName.toLowercase()) ||
-          !moment.utc(date_of_birth).isSame(dateOfBirth, 'day')
-        );
-      };
+      const check = () =>
+        (first_name.toLowerCase() !== firstName.toLowercase() &&
+          first_name.toLowerCase() !== lastName.toLowercase()) ||
+        (last_name.toLowerCase() !== lastName.toLowercase() &&
+          last_name.toLowerCase() !== firstName.toLowercase()) ||
+        (middle_name.toLowerCase() !== lastName.toLowercase() &&
+          middle_name.toLowerCase() !== firstName.toLowercase()) ||
+        !moment.utc(date_of_birth).isSame(dateOfBirth, 'day');
 
       if (check()) {
         // bvn resolved but not a perfect match;
@@ -206,7 +236,7 @@ class UsersController {
       // bvn is a perfect match
       req.user.isBVNVerified = true;
       await req.user.save();
-      response(res, 200, 'bvn verified successfully');
+      return response(res, 200, 'bvn verified successfully');
     } catch (error) {
       return next(error);
     }
