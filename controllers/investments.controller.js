@@ -34,6 +34,11 @@ class InvestmentsController {
       InvestmentsController.validateRequest(req, false);
 
       const wallet = await user.getWallet();
+
+      if (!wallet.canWithdraw(req.body.capital)) {
+        throw createError(422, 'insufficient wallet balance');
+      }
+
       const investment = await Investment.create({
         ...req.body,
         user: user.id,
