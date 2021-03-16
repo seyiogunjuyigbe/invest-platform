@@ -12,13 +12,24 @@ function processPopulate(query) {
       currentPopulate = populate;
     }
   }
-
   return currentPopulate;
 }
-
+function processAggregate(query, search) {
+  const paths = query.split('.');
+  const currentAggregate = [];
+  paths.forEach(path => {
+    const c = { $match: {} };
+    c.$match[path] = {
+      $regex: new RegExp(search, 'i'),
+    };
+    currentAggregate.push(c);
+  });
+  console.log(currentAggregate);
+  return currentAggregate;
+}
 const get = async (model, req, conditions = {}, multiple = true) => {
   const { query } = req;
-  const { populate } = query;
+  const { populate, searchBy, keyword } = query;
   const limit = parseInt(query.limit || '10', 10);
   const offset = parseInt(query.offset || '0', 10);
   const orderBy = query.orderBy ? query.orderBy : 'createdAt';
@@ -30,7 +41,8 @@ const get = async (model, req, conditions = {}, multiple = true) => {
   delete query.order;
   delete query.orderBy;
   delete query.hours;
-
+  delete query.searchBy;
+  delete query.keyword;
   if (!_.isEmpty(query)) {
     Object.keys(query).forEach(field => {
       let value = query[field];
@@ -69,7 +81,15 @@ const get = async (model, req, conditions = {}, multiple = true) => {
       q = q.populate(processPopulate(populate));
     }
   }
-
+  if ((searchBy, keyword)) {
+    if (Array.isArray(searchBy) && searchBy.length) {
+      searchBy.forEach((field, i) => {
+        q = model.aggregate(processAggregate(field, keyword[i]));
+      });
+    } else {
+      q = model.aggregate(processAggregate(searchBy, keyword));
+    }
+  }
   if (multiple) {
     const total = await model.countDocuments(conditions);
     q = q
