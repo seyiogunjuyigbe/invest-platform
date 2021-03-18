@@ -7,21 +7,32 @@ const { asyncSeries } = require('../utils/app');
 async function processPendingTransaction(transaction) {
   console.log(`***** Processing transaction with ID(${transaction.id})`);
 
-  return transaction.processPayment();
+  try {
+    return transaction.processPayment();
+  } catch (error) {
+    console.log(
+      `***** Error Processing transaction with ID(${transaction.id})`,
+      error
+    );
+  }
 }
 
 async function processPendingTransactions() {
-  console.log('***** Running processPendingTransactions job *****');
-  const allPendingTransactions = await Transaction.find({
-    status: 'pending',
-    type: 'deposit',
-  });
+  try {
+    console.log('***** Running processPendingTransactions job *****');
+    const allPendingTransactions = await Transaction.find({
+      status: 'pending',
+      type: 'deposit',
+    });
 
-  console.log(
-    `***** Found ${allPendingTransactions.length} pending transactions *****`
-  );
+    console.log(
+      `***** Found ${allPendingTransactions.length} pending transactions *****`
+    );
 
-  return asyncSeries(allPendingTransactions, processPendingTransaction);
+    return asyncSeries(allPendingTransactions, processPendingTransaction);
+  } catch (error) {
+    console.log('Error processing pending transactions');
+  }
 }
 
 module.exports = async () => {

@@ -227,18 +227,18 @@ module.exports = class Flutterwave {
       console.log('Error saving transactions', JSON.stringify(error));
 
       if (
-        error &&
-        error.response &&
-        error.response.body &&
-        error.response.body.data &&
-        error.response.body.data.code &&
-        error.response.body.data.code === 'NO TX'
+        (error &&
+          error.response &&
+          error.response.body &&
+          error.response.body.data &&
+          error.response.body.data.code &&
+          error.response.body.data.code === 'NO TX') ||
+        (error && error.message === 'Transaction not found')
       ) {
-        await tnx.update({ status: 'cancelled' });
-        throw createError(404, 'No transaction record on payment processor');
-      } else {
-        throw error;
+        await tnx.updateOne({ status: 'cancelled' });
+        return { success: false };
       }
+      throw error;
     }
   }
 
