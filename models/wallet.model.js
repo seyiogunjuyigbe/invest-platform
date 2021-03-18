@@ -35,7 +35,7 @@ const walletSchema = new Schema(
   }
 );
 
-walletSchema.methods.canWithdraw = async function canWithdraw(amount) {
+walletSchema.methods.canWithdraw = function canWithdraw(amount) {
   return this.balance >= amount;
 };
 
