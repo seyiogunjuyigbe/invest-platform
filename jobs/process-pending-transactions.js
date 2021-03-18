@@ -25,6 +25,7 @@ async function processPendingTransactions() {
 }
 
 module.exports = async () => {
+  await processPendingTransactions();
   const cron = '0 0 */1 * * *';
   console.info(
     `Loaded processPendingTransactions job to be run ${cronstrue.toString(
