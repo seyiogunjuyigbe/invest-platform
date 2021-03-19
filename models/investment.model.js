@@ -128,7 +128,7 @@ investmentSchema.methods.withdrawToWallet = async function withdrawToWallet(
   await wallet.credit(transaction);
 
   return this.updateOne({
-    currentBalance: newBalance,
+    currentBalance: type === 'payout' ? 0 : newBalance,
     totalPaidOut: newTotalPaidOut,
   });
 };
@@ -141,7 +141,7 @@ investmentSchema.methods.payout = async function payout(amount = 0) {
       amount
     )} has been paid to your wallet`;
     await createNotification([this.user], title, message, true);
-    await sendPushNotification([this.user._id], title, message);
+    await sendPushNotification([this.user], title, message);
   }
   return this.updateOne({
     isClosed: true,
@@ -216,6 +216,18 @@ investmentSchema.methods.creditReturn = async function creditReturn(
 
 investmentSchema.methods.cancel = async function cancel() {
   let amountPayable = this.currentBalance;
+
+  if (amountPayable <= 0) {
+    await this.updateOne({
+      isClosed: true,
+      liquidationDate: m.utc().toDate(),
+    });
+
+    throw createError(
+      422,
+      'no funds in investment. investment has been closed'
+    );
+  }
 
   if (m.utc(this.maturityDate).isAfter(m.utc())) {
     const penaltyFee = currCalc(
