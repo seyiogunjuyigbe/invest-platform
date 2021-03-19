@@ -1,4 +1,6 @@
 const createError = require('http-errors');
+const _ = require('lodash');
+const m = require('moment');
 const Transaction = require('../models/transaction.model');
 const BankAccount = require('../models/bank.account.model');
 
@@ -92,15 +94,26 @@ class TransactionsController {
       const conditions = ['superadmin', 'admin'].includes(req.user.type)
         ? {}
         : { user: req.user.id };
-      const { from, to } = req.query;
+      const { from, to, searchBy, keyword } = req.query;
+      const createdAt = {};
       if (from) {
-        conditions.createdAt = { $gte: from };
+        createdAt.$gte = m.utc(from).startOf('day').toDate();
       }
       if (to) {
-        conditions.createdAt = { $lte: to };
+        createdAt.$lte = m.utc(to).startOf('day').toDate();
       }
-      delete req.query.from;
-      delete req.query.to;
+      if (from === to) {
+        createdAt.$lt = m.utc(to).add(1, 'day').startOf('day').toDate();
+        delete createdAt.$lte;
+      }
+      if (searchBy && keyword) {
+        conditions[searchBy] = new RegExp(keyword, 'i');
+      }
+      if (Object.keys(createdAt).length) {
+        conditions.createdAt = createdAt;
+      }
+      req.query = _.omit(req.query, ['to', 'from', 'searchBy', 'keyword']);
+      console.log(conditions);
 
       const histories = await find(Transaction, req, conditions);
       return res.status(200).json({

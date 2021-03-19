@@ -102,7 +102,12 @@ class PortfolioController {
 
   static async fetchPortfolios(req, res, next) {
     try {
-      const portfolios = await find(Portfolio, req);
+      const conditions = {};
+      const { searchBy, keyword } = req.query;
+      if (searchBy && keyword) {
+        conditions[searchBy] = new RegExp(keyword, 'i');
+      }
+      const portfolios = await find(Portfolio, req, conditions);
       portfolios.data.map(async portfolio => ({
         ...portfolio.toJSON(),
         investorCount: await portfolio.getInvestorCount(),
