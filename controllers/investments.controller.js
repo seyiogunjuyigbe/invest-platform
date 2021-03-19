@@ -32,7 +32,12 @@ class InvestmentsController {
       }
 
       InvestmentsController.validateRequest(req, false);
-
+      if (!user.signedPortfolioMous.includes(req.body.portfolio)) {
+        return res.status(401).json({
+          message: 'MOU signature required before investment can be funded',
+          data: null,
+        });
+      }
       const wallet = await user.getWallet();
 
       if (!wallet.canWithdraw(req.body.capital)) {

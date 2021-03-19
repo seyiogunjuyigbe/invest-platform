@@ -4,6 +4,7 @@ const User = require('../models/user.model');
 const { find, findOne } = require('../utils/query');
 const { validate } = require('../utils/validator');
 const { sendPushNotification } = require('../services/notification.service');
+const requestSignature = require('../services/hellosign');
 
 class PortfolioController {
   static async createPortfolio(req, res, next) {
@@ -25,6 +26,7 @@ class PortfolioController {
         ...req.body,
         image,
         memorandum,
+        localPath: `${req.body.title}_${Date.now()}`,
       });
       if (startDate && endDate) {
         if (moment.utc(startDate).diff(moment.utc(endDate), 'days') > 0) {
@@ -128,6 +130,51 @@ class PortfolioController {
       });
     } catch (err) {
       next(err);
+    }
+  }
+
+  static async initiateMouSignature(req, res, next) {
+    try {
+      let portfolio = await Portfolio.findById(req.params.portfolioId);
+      if (!portfolio) {
+        return res.status(400).json({ message: 'portfolio not found' });
+      }
+      if (!portfolio.localPath) {
+        await portfolio.updateOne({
+          localPath: `${portfolio.title}_${Date.now()}`,
+        });
+        portfolio = await Portfolio.findById(portfolio._id);
+      }
+      const getSignUrl = await requestSignature(req.user, portfolio);
+      const isSuccessful =
+        getSignUrl.statusCode === 200 && getSignUrl.statusMessage === 'OK';
+      return res.status(isSuccessful ? 200 : 400).json({
+        message: isSuccessful
+          ? 'signature request initiated successfully'
+          : 'an error occured, plese try again',
+        data: getSignUrl ? getSignUrl.embedded : null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async completeMouSignature(req, res, next) {
+    try {
+      if (req.headers['user-agent'] !== 'HelloSign API') {
+        return res.status(403).json({ message: 'Unauthorized access' });
+      }
+      const reqBody = JSON.parse(req.body.json);
+      if (reqBody && reqBody.event.event_type === 'signature_request_signed') {
+        const { portfolioId, userId } = reqBody.signature_request.metadata;
+        const portfolio = await Portfolio.findById(portfolioId);
+        const user = await User.findById(userId);
+        user.signedPortfolioMous.addToSet(portfolio._id);
+        await user.save();
+      }
+      return res.status(200).send('Hello API Event Received');
+    } catch (error) {
+      next(error);
     }
   }
 
