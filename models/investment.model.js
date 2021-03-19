@@ -141,7 +141,7 @@ investmentSchema.methods.payout = async function payout(amount = 0) {
       amount
     )} has been paid to your wallet`;
     await createNotification([this.user], title, message, true);
-    await sendPushNotification([this.user._id], title, message);
+    await sendPushNotification([this.user], title, message);
   }
   return this.updateOne({
     isClosed: true,

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const Flutterwave = require('../services/flutterwave.service');
-const User = require('./user.model');
 
 const flutterwave = Flutterwave.getInstance();
 
@@ -98,13 +97,16 @@ TransactionSchema.methods.processPayment = async function processPayment() {
   switch (this.type) {
     case 'deposit':
       // eslint-disable-next-line
+      const UserModel = require('./user.model');
+
+      // eslint-disable-next-line
       const isSuccessful = await this.verify();
 
       if (isSuccessful) {
         const user =
           this.user && this.user.name
             ? this.user
-            : await User.findById(this.user);
+            : await UserModel.findById(this.user);
         const wallet = await user.getWallet();
         await wallet.credit(this);
 
