@@ -92,3 +92,27 @@
         200:
           description: Success
           example: portfolio deleted
+  /portfolios/{portfolioId}/get-signurl:
+    get:
+      summary: Get hello-sign url
+      description: Get hello-sign url prior. This enables the user to sign the portfolio MOU before investing
+      operationId: getSignUrl
+      tags:
+      - Portfolios
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              sign_url:
+                type: string
+                example: https://app.hellosign.com/editor/embeddedSign?signature_id=SIGNATUREID&token=TOKEN
+              expires_at:
+                type: string
+                example: 1616152538
+                

@@ -26,6 +26,7 @@ const portfolioSchema = new Schema(
     maxInvestment: Number,
     image: String,
     memorandum: String,
+    localPath: String,
   },
   { timestamps: true }
 );
