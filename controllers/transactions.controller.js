@@ -113,8 +113,6 @@ class TransactionsController {
         conditions.createdAt = createdAt;
       }
       req.query = _.omit(req.query, ['to', 'from', 'searchBy', 'keyword']);
-      console.log(conditions);
-
       const histories = await find(Transaction, req, conditions);
       return res.status(200).json({
         message: 'transaction histories retrieved successfully',
