@@ -100,11 +100,7 @@ class TransactionsController {
         createdAt.$gte = m.utc(from).startOf('day').toDate();
       }
       if (to) {
-        createdAt.$lte = m.utc(to).startOf('day').toDate();
-      }
-      if (from === to) {
-        createdAt.$lt = m.utc(to).add(1, 'day').startOf('day').toDate();
-        delete createdAt.$lte;
+        createdAt.$lte = m.utc(to).endOf('day').toDate();
       }
       if (searchBy && keyword) {
         conditions[searchBy] = new RegExp(keyword, 'i');
