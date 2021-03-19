@@ -222,7 +222,6 @@ class UsersController {
         (middle_name.toLowerCase() !== lastName.toLowercase() &&
           middle_name.toLowerCase() !== firstName.toLowercase()) ||
         !moment.utc(date_of_birth).isSame(dateOfBirth, 'day');
-
       if (check()) {
         // bvn resolved but not a perfect match;
         // TODO: send notification to admin

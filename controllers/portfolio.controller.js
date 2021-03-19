@@ -1,4 +1,5 @@
 const moment = require('moment');
+const _ = require('lodash');
 const Portfolio = require('../models/portfolio.model');
 const User = require('../models/user.model');
 const { find, findOne } = require('../utils/query');
@@ -105,7 +106,14 @@ class PortfolioController {
 
   static async fetchPortfolios(req, res, next) {
     try {
-      const portfolios = await find(Portfolio, req);
+      const conditions = {};
+      const { searchBy, keyword } = req.query;
+      if (searchBy && keyword) {
+        conditions[searchBy] = new RegExp(keyword, 'i');
+      }
+      req.query = _.omit(req.query, ['searchBy', 'keyword']);
+
+      const portfolios = await find(Portfolio, req, conditions);
       portfolios.data.map(async portfolio => ({
         ...portfolio.toJSON(),
         investorCount: await portfolio.getInvestorCount(),
