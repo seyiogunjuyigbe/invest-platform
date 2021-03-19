@@ -35,7 +35,7 @@ module.exports = function requestMouSignature(user, portfolio) {
         test_mode: NODE_ENV === 'production' ? 0 : 1,
         clientId: HELLOSIGN_CLIENT_ID,
         subject: portfolio.title,
-        message: 'Please sign this MOU to procees with your investment',
+        message: 'Please sign this MOU to proceed with your investment',
         signers: [
           {
             email_address: user.email,

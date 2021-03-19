@@ -5,6 +5,7 @@ const { find, findOne } = require('../utils/query');
 const { validate } = require('../utils/validator');
 const { sendPushNotification } = require('../services/notification.service');
 const requestSignature = require('../services/hellosign');
+const compareHash = require('../middlewares/compare-hash');
 
 class PortfolioController {
   static async createPortfolio(req, res, next) {
@@ -161,10 +162,10 @@ class PortfolioController {
 
   static async completeMouSignature(req, res, next) {
     try {
-      if (req.headers['user-agent'] !== 'HelloSign API') {
+      const reqBody = JSON.parse(req.body.json);
+      if (!compareHash(reqBody.event)) {
         return res.status(403).json({ message: 'Unauthorized access' });
       }
-      const reqBody = JSON.parse(req.body.json);
       if (reqBody && reqBody.event.event_type === 'signature_request_signed') {
         const { portfolioId, userId } = reqBody.signature_request.metadata;
         const portfolio = await Portfolio.findById(portfolioId);
@@ -240,4 +241,5 @@ class PortfolioController {
     validate(body, { properties: fields });
   }
 }
+
 module.exports = PortfolioController;
