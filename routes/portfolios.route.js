@@ -44,4 +44,14 @@ router.delete(
   adminRoute(),
   Portfolio.deletePortfolio
 );
+router.get(
+  '/:portfolioId/get-signurl',
+  checkAuth,
+  Portfolio.initiateMouSignature
+);
+router.post(
+  '/verify-signature',
+  upload.single(''),
+  Portfolio.completeMouSignature
+);
 module.exports = router;
