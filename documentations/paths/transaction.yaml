@@ -1,0 +1,173 @@
+# Transaction Paths
+  /transactions:
+    get:
+      summary: fetch all user transactions
+      description: fetch all user transactions
+      operationId: fetchTransactions
+      tags:
+      - Transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+             $ref: "#/definitions/Transaction"
+  /transactions/{transactionId}:
+    get:
+      summary: fetch single transaction
+      description: fetch one transaction
+      operationId: fetchTransaction
+      tags:
+      - Transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+             $ref: "#/definitions/Transaction"         
+  /transactions/initiate:
+    post:
+      summary: initiate transaction
+      description: initiate transaction
+      operationId: initiateTransaction
+      tags:
+      - Transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: number
+                description: deposit amount
+                required: true
+              authType:
+                type: string
+                enum: [url, manual]
+                description: do you want a pre-generated payment URL or want to manually construct yourself ?
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  transaction:
+                    $ref: "#/definitions/Transaction"
+                  auth:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      message:
+                        type: string
+                      data:
+                        type: object
+                        properties:
+                          link:
+                            type: string
+  /transactions/{transactionId}/verify:
+    post:
+      summary: verify transaction
+      description: verify transaction
+      operationId: verifyTransaction
+      tags:
+      - Transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+  /transactions/withdraw:
+    post:
+      summary: new user withdrawal request
+      description: new user withdrawal request
+      operationId: newWithdrawal
+      tags:
+      - Withdrawals
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          type: object
+          properties:
+            amount:
+              type: string
+              required: true
+            bankAccountId:
+              type: string
+              required: true
+            currency:
+              type: string
+              required: false                            
+          description: User ID(if fetched by admin)
+          required: false
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/Transaction"
+  /transactions/{transactionId}/process-withdrawal:
+    get:
+      summary: process withdrawal request as admin
+      description: process withdrawal requests
+      operationId: processWithdrawal
+      tags:
+      - Withdrawals
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                schema:
+                  $ref: "#/definitions/Transaction"                                  

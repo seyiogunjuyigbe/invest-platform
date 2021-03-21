@@ -1,0 +1,118 @@
+# Portfolio paths
+  /portfolios:
+    post:
+      summary: create new investment portfolio
+      description: create new investment portfolio
+      operationId: createPortfolio
+      tags:
+      - Portfolios
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: portfolio details
+          required: true
+          schema:
+            $ref: "#/definitions/Portfolio"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Portfolio"
+    get:
+      summary: fetch all investment portfolios
+      description: fetch all investment portfolios
+      operationId: fetchPortfolios
+      tags:
+      - Portfolios
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Portfolio"
+  /portfolios/{portfolioId}:
+    get:
+      summary: fetch portfolio
+      description: fetch portfolio
+      operationId: fetchPortfolio
+      tags:
+      - Portfolios
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Portfolio"             
+    put:
+      summary: update portfolio
+      description: update portfolio
+      operationId: updatePortfolio
+      tags:
+      - Portfolios
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: portfolio details
+          required: true
+          schema:
+            $ref: "#/definitions/Portfolio"          
+      responses:
+        200:
+          description: Success
+          schema:
+             $ref: "#/definitions/Portfolio"
+    delete:
+      summary: delete portfolio
+      description: delete portfolio
+      operationId: deletePortfolio
+      tags:
+      - Portfolios
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          example: portfolio deleted
+  /portfolios/{portfolioId}/get-signurl:
+    get:
+      summary: Get hello-sign url
+      description: Get hello-sign url prior. This enables the user to sign the portfolio MOU before investing
+      operationId: getSignUrl
+      tags:
+      - Portfolios
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            properties:
+              sign_url:
+                type: string
+                example: https://app.hellosign.com/editor/embeddedSign?signature_id=SIGNATUREID&token=TOKEN
+              expires_at:
+                type: string
+                example: 1616152538
+                

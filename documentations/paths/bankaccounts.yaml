@@ -1,0 +1,172 @@
+# Bank Account Routes
+  /bank-accounts/fetch-banks:
+    get:
+      summary: Fetch All Banks
+      operationId: fetchBanks
+      tags:
+      - Bank Accounts
+      parameters:
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true        
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object    
+  /bank-accounts:
+    post:
+      summary: Create wew bank account
+      operationId: newUserBankAccount
+      tags:
+      - Bank Accounts
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true
+        - in: body
+          name: payload
+          type: object
+          properties:
+            bankName: string
+            bankCode: string
+            bankAccount: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/BankAccount"  
+    get:
+      summary: Fetch user bank account
+      operationId: getUserBankAccount
+      tags:
+      - Bank Accounts
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/BankAccount"
+  /bank-accounts/{bankAccountId}:
+    get:
+      summary: Fetch user bank account
+      operationId: getBankAccount
+      tags:
+      - Bank Accounts
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                schema:
+                  $ref: "#/definitions/BankAccount"                  
+    delete:
+      summary: Delete user bank account
+      operationId: deleteBankAccount
+      tags:
+      - Bank Accounts
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                schema:
+                  $ref: "#/definitions/BankAccount"   
+  /bank-accounts/:bankAccountId/set-default:          
+    get:
+      summary: Set bank account as default
+      operationId: defaultBankAccount
+      tags:
+      - Bank Accounts
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                schema:
+                  $ref: "#/definitions/BankAccount" 
+  /bank-accounts/:bankAccountId/verify:          
+    post:
+      summary: verify bank account(admin)
+      operationId: verifyBankAccount
+      tags:
+      - Bank Accounts
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true 
+        - in: body
+          name: payload
+          type: object
+          properties:
+            status:
+              type: string
+              required: true  
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                schema:
+                  $ref: "#/definitions/BankAccount"                    

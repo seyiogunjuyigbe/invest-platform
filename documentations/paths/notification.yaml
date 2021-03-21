@@ -1,0 +1,77 @@
+# Notification Routes
+  /notifications:
+    get:
+      summary: fetch user notifications
+      description: fetch user notifications
+      operationId: fetchNotifications
+      tags:
+      - Notifications
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Notification"
+  /notifications/mark-read:
+    post:
+      summary: mark notifications as read
+      description: mark notifications as read
+      operationId: readNotifications
+      tags:
+      - Notifications
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: notificationIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Notification"                
+  /notifications/{notificationId}:
+    get:
+      summary: fetch notification
+      description: fetch notification
+      operationId: fetchNotification
+      tags:
+      - Notifications
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Notification"    
+  /notifications/get-token:
+    get:
+      summary: get notification token
+      description: get notification token
+      operationId: getNotificationToken
+      tags:
+      - Notifications
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          type: string
+          example: new_notification_token                 

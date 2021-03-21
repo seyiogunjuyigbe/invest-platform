@@ -1,0 +1,115 @@
+# Document paths
+  /documents:
+    post:
+      summary: add new verification document
+      description: add new verification document
+      operationId: addDocument
+      tags:
+      - Documents
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: verification details
+          required: true
+          schema:
+            $ref: "#/definitions/Document"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Document"
+    get:
+      summary: fetch all documents
+      description: fetch all documents
+      operationId: fetchDocuments
+      tags:
+      - Documents
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/Document"
+  /documents/{docId}:
+    get:
+      summary: fetch document
+      description: fetch document
+      operationId: fetchDocument
+      tags:
+      - Documents
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                schema:
+                  $ref: "#/definitions/Document"             
+    delete:
+      summary: delete document
+      description: delete document
+      operationId: deleteDocument
+      tags:
+      - Documents
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: string
+    put:
+      summary: update verification request(admin)
+      description: update verification
+      operationId: updateDocument
+      tags:
+      - Documents
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: verification details
+          required: true
+          schema:
+            $ref: "#/definitions/Document"          
+      responses:
+        200:
+          description: Success
+          schema:
+             $ref: "#/definitions/Document"

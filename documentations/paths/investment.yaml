@@ -1,0 +1,217 @@
+# Investment paths
+  /investments:
+    post:
+      summary: create new investment - admin only
+      description: create new investment - admin only
+      operationId: createInvestment
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: investment details
+          required: true
+          schema:
+            $ref: "#/definitions/Investment"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Investment"
+    get:
+      summary: fetch all investments
+      description: fetch all investments
+      operationId: fetchInvestments
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Investment"
+
+  /investments/create-and-fund:
+    post:
+      summary: create and fund new investment
+      description: create and fund new investment
+      operationId: createAndFundInvestment
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: investment details
+          required: true
+          schema:
+            $ref: "#/definitions/Investment"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Investment"
+
+  /investments/{investmentId}/fund:
+    post:
+      summary: fund investment
+      description: fund investment
+      operationId: fundInvestment
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: investment details
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: number
+                required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Investment"
+
+  /investments/{investmentId}/cancel:
+    post:
+      summary: cancel / opt-out of investment
+      description: cancel / opt-out of investment
+      operationId: cancelInvestment
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'investment cancelled and funds deposited into wallet'
+
+  /investments/{investmentId}/credit-return:
+    post:
+      summary: credit investment return - admin only
+      description: credit investment return - admin only
+      operationId: creaditInvestmentReturn
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: investment details
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: number
+                required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Investment"
+
+  /investments/{investmentId}/list-returns:
+    get:
+      summary: list investment returns
+      description: list investment returns
+      operationId: listInvestmentReturns
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/InvestmentReturn"
+
+  /investments/{investmentId}:
+    get:
+      summary: fetch investment
+      description: fetch investment
+      operationId: fetchInvestment
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Investment"             
+    put:
+      summary: update investment
+      description: update investment
+      operationId: updateInvestment
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: payload
+          description: investment details
+          required: true
+          schema:
+            $ref: "#/definitions/Investment"          
+      responses:
+        200:
+          description: Success
+          schema:
+             $ref: "#/definitions/Investment"
+    delete:
+      summary: delete investment
+      description: delete investment
+      operationId: deleteInvestment
+      tags:
+      - Investments
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          example: investment deleted

@@ -1,0 +1,240 @@
+# auth paths
+  /auth/login:
+    post:
+      summary: Login user with email
+      operationId: userLogin
+      tags:
+      - Authentication
+      parameters:
+        - in: body
+          name: payload
+          description: User credentials to use for authentication
+          required: true
+          schema:
+            $ref: "#/definitions/UserLogin"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/AuthResponse"
+  /auth/change-password:
+    post:
+      summary: Change Password
+      operationId: passwordChange
+      tags:
+      - Authentication
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: body
+          name: oldPassword
+          required: true
+        - in: body
+          name: newPassword
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              message: password changed successfully
+        400:
+          description: Bad request
+          schema:
+            example:
+              message: old password incorrect
+        500:
+          description: Unexpected server error
+          schema:
+            example:
+  /auth/profile:
+    get:
+      summary: Fetch profile of logged in user
+      operationId: fetchProfile
+      tags:
+      - Authentication
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true     
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: profile retrieved successfully
+              data:
+                $ref: "#/definitions/User"
+  
+  /auth/resend-verification:
+    get:
+      summary: Resends verification email to user
+      description: Initiate email verification for user by sending verification to the user
+      operationId: verifyUserEmail
+      tags:
+      - Authentication
+      parameters:
+        - in: body
+          name: email
+          description: Email of the account to verify
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              message: OTP sent
+        400:
+          description: Bad request
+          schema:
+            examples:
+              message: Token is either invalid or email does not exist
+
+  /auth/verify/{otp}:
+    get:
+      summary: Verifies user email
+      tags:
+      - Authentication
+      parameters:
+        - in: path
+          name: otp
+          description: otp verification email sent to the user
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              verified: true
+        400:
+          description: Bad request
+          schema:
+            example:
+              message: "Missing required parameters (code: invalid_token | token_expired)"
+        500:
+          description: Unexpected server error
+          schema:
+            example:
+              message: An unexpected error occured
+
+  /auth/recover-password:
+    get:
+      summary: Request password reset
+      operationId: passwordResetRequest
+      tags:
+      - Authentication
+      parameters:
+        - in: body
+          name: email
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              message: Password reset link successfully sent
+        400:
+          description: Bad request
+          schema:
+            example:
+              message: Missing required parameters
+        404:
+          description: Not found
+          schema:
+            example:
+              message: User with email not found
+        500:
+          description: Unexpected server error
+          schema:
+            example:
+  /auth/reset-password/{otp}: 
+    post:
+      summary: Reset Password
+      operationId: passwordReset
+      tags:
+      - Authentication
+      parameters:
+        - in: body
+          name: password
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              message: Password reset successfully
+        400:
+          description: Bad request
+          schema:
+            example:
+              message: Missing required parameters
+        404:
+          description: Not found
+          schema:
+            example:
+              message: User with email not found
+        500:
+          description: Unexpected server error
+          schema:
+            example:           
+  /auth/request-otp:
+    get:
+      summary: Request Otp for User Verification
+      description: Initiate verification by sending otp to the user
+      operationId: requestOtp
+      tags:
+      - Authentication
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              message: OTP sent
+        400:
+          description: Bad request
+          schema:
+            examples:
+              message: Token is either invalid or email does not exist
+
+  /auth/verify-otp/{otp}:
+    get:
+      summary: Verifies verification OTP
+      tags:
+      - Authentication
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+        - in: path
+          name: otp
+          description: otp verification sent to the user
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            example:
+              verified: true
+        400:
+          description: Bad request
+          schema:
+            example:
+              message: "Missing required parameters (code: invalid_token | token_expired)"
+        500:
+          description: Unexpected server error
+          schema:
+            example:
+              message: An unexpected error occured
+

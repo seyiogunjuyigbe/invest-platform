@@ -1,0 +1,43 @@
+# Dashboard paths
+  /dashboard/investment-data:
+    get:
+      summary: fetch all investment data - admin only
+      description: fetch all investment data - admin only
+      operationId: getInvestmentData
+      tags:
+      - Dashboard
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: investments data retrieved successfully
+              data:
+                type: object
+                properties:
+                  totalInvestorCount:
+                    type: integer
+                  totalPortfolioCount:
+                    type: integer
+                  totalInvestmentCount:
+                    type: integer
+                  poolBalance:
+                    type: number
+                  investorCountByCategories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category:
+                          type: string
+                          example: Forex Investors
+                        investorCount:
+                          type: integer

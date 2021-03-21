@@ -1,0 +1,42 @@
+#Investment
+  Investment:
+    type: object
+    properties:
+      name:
+        type: string
+      capital:
+        type: number
+        required: true
+        description: amount to be funded into investment
+      portfolio:
+        type: string
+        required: true
+        description: Object ID of the portfolio in which investment is made
+      user:
+        type: string
+        description: User Object ID - only required if created by admin
+
+  InvestmentReturn:
+    type: object
+    properties:
+      amount:
+        type: number
+      capital:
+        type: number
+      currentBalance:
+        type: number
+      previousBalance:
+        type: number
+      capitalGains:
+        type: number
+      totalFunded:
+        type: number
+      totalPaidOut:
+        type: number
+      creditedBy:
+        type: string
+      user:
+        type: string
+      investment:
+        type: string
+

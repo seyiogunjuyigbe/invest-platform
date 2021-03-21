@@ -1,0 +1,55 @@
+# User Definitions
+  User:
+    type: object
+    properties:
+      firstName:
+        type: string
+        required: true
+      lastName:
+        type: string
+        required: true
+      email:
+        type: string
+        example: user@example.com
+      type:
+        type: string
+        enum: ['investor','admin','superadmin']
+        example: investor
+        description: user type
+      role:
+        type: string
+        enum: ['finance','non-finance','none']
+        example: none
+        description: user role        
+      phone:
+        type: string
+        description: user phone number
+      password:
+        type: string
+        minLength: 6
+      bvn:
+        type: string
+        description: user bvn
+      isBVNVerified:
+        type: boolean
+        example: false
+      dateOfBirth: 
+          type: string
+      stateOfOrigin: 
+        type: string
+      gender: 
+        type: string
+      nationality: 
+        type: string
+      occupation: 
+        type: string
+      residentialAddress: 
+        type: string
+      cityOfResidence: 
+        type: string
+      countryOfResidence: 
+        type: string
+      identificationDoc: 
+        type: string
+      identificationDocNumber: 
+        type: string

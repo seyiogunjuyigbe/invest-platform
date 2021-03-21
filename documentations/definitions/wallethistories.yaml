@@ -1,0 +1,21 @@
+#Wallet
+  WalletHistory:
+    type: object
+    properties:
+      balance:
+        type: number
+      previousBalance: 
+        type: number
+      type:
+        type: string
+      description:
+        type: string
+      amount:
+        type: number
+      transaction:
+        type: object
+      user:
+        type: object
+      wallet:
+        type: object        
+        

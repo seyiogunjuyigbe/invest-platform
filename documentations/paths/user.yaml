@@ -1,0 +1,154 @@
+# user paths
+  /users:
+    post:
+      summary: Create new user as admin
+      operationId: adminCreateUser
+      tags:
+      - Users
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true      
+        - in: body
+          name: payload
+          description: User credentials
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/User"
+    get:
+      summary: Fetch all users
+      operationId: fetchAllUsers
+      tags:
+      - Users
+      parameters:
+        - in: header
+          name: Authorization
+          description: Authentication token
+          required: true      
+        - in: body
+          name: payload
+          description: User credentials
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/User"            
+  /users/signup:
+    post:
+      summary: Sign Up
+      operationId: signUp
+      tags:
+      - Users
+      parameters:    
+        - in: body
+          name: payload
+          description: User credentials
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/User"
+  /users/{userId}:
+    get:
+      summary: Fetch User
+      operationId: fetchUser
+      tags:
+      - Users
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/User"      
+    put:
+      summary: Update User
+      operationId: updateUser
+      tags:
+      - Users
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+        - in: body
+          name: payload
+          description: User credentials
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/User"       
+    delete:
+      summary: Delete User
+      operationId: deleteUser
+      tags:
+      - Users
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/User"                          
+  /users/get-wallet:
+    get:
+      summary: Fetch User Wallet
+      operationId: fetchUserWallet
+      tags:
+      - Users
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Wallet"
+
+  /users/get-wallet-histories:
+    get:
+      summary: Fetch User Wallet Histories
+      operationId: getUserWalletHistories
+      tags:
+      - Users
+      parameters: 
+        - in: header
+          name: Auhentication
+          description: Bearer Token
+          required: true   
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/WalletHistory"

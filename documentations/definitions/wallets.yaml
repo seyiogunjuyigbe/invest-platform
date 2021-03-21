@@ -1,0 +1,11 @@
+#Wallet
+  Wallet:
+    type: object
+    properties:
+      balance:
+        type: number
+      previousBalance: 
+        type: number
+      user:
+        type: object
+        
